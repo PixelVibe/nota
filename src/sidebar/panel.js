@@ -2,7 +2,8 @@ import * as snabbdom from 'snabbdom';
 import { h } from 'snabbdom';
 
 const patch = snabbdom.init([
-  require('snabbdom/modules/eventlisteners').default
+  require('snabbdom/modules/eventlisteners').default,
+  require('snabbdom/modules/attributes').default
 ]);
 const container = document.getElementById('notesContainer');
 
@@ -32,7 +33,7 @@ browser.runtime.onMessage.addListener((msg) => {
       refreshContent();
       break;
     }
-    
+
     case 'popup-is-active': {
       if (editingNote > -1) {
         const noteIndex = editingNote;
@@ -106,8 +107,16 @@ async function buildSidePanelNotes(notes) {
             return h('span', `#${tag}`)
           })),
           h('div.note-tools', {}, [
-            h('a.note-tools--edit', { on: { click: [editNote, index] } }, 'edit'),
-            h('a.note-tools--delete', { on: { click: [deleteNote, index] } }, 'delete'),
+            h('a.note-tools--edit', { on: { click: [editNote, index] } }, [
+              h('svg', { attrs: { width: 24, height: 24, viewBox: '0 0 24 24' } }, [
+                h('use', { attrs: { 'xlink:href': "#edit" } })
+              ])
+            ]),
+            h('a.note-tools--delete', { on: { click: [deleteNote, index] } }, [
+              h('svg', { attrs: { width: 24, height: 24, viewBox: '0 0 24 24' } }, [
+                h('use', { attrs: { 'xlink:href': "#delete" } })
+              ])
+            ]),
           ])])
       ])
     )
@@ -126,7 +135,7 @@ async function deleteNote(noteIndex) {
       type: 'delete-note',
       body: {
         _id: url,
-        noteIndex
+        index: noteIndex,
       }
     });
   }

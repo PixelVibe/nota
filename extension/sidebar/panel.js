@@ -658,6 +658,72 @@ function vnode(sel, data, children, text, elm) {
 
 /***/ }),
 
+/***/ "./node_modules/snabbdom/modules/attributes.js":
+/*!*****************************************************!*\
+  !*** ./node_modules/snabbdom/modules/attributes.js ***!
+  \*****************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", { value: true });
+var xlinkNS = 'http://www.w3.org/1999/xlink';
+var xmlNS = 'http://www.w3.org/XML/1998/namespace';
+var colonChar = 58;
+var xChar = 120;
+function updateAttrs(oldVnode, vnode) {
+    var key, elm = vnode.elm, oldAttrs = oldVnode.data.attrs, attrs = vnode.data.attrs;
+    if (!oldAttrs && !attrs)
+        return;
+    if (oldAttrs === attrs)
+        return;
+    oldAttrs = oldAttrs || {};
+    attrs = attrs || {};
+    // update modified attributes, add new attributes
+    for (key in attrs) {
+        var cur = attrs[key];
+        var old = oldAttrs[key];
+        if (old !== cur) {
+            if (cur === true) {
+                elm.setAttribute(key, "");
+            }
+            else if (cur === false) {
+                elm.removeAttribute(key);
+            }
+            else {
+                if (key.charCodeAt(0) !== xChar) {
+                    elm.setAttribute(key, cur);
+                }
+                else if (key.charCodeAt(3) === colonChar) {
+                    // Assume xml namespace
+                    elm.setAttributeNS(xmlNS, key, cur);
+                }
+                else if (key.charCodeAt(5) === colonChar) {
+                    // Assume xlink namespace
+                    elm.setAttributeNS(xlinkNS, key, cur);
+                }
+                else {
+                    elm.setAttribute(key, cur);
+                }
+            }
+        }
+    }
+    // remove removed attributes
+    // use `in` operator since the previous `for` iteration uses it (.i.e. add even attributes with undefined value)
+    // the other option is to remove all attributes with value == undefined
+    for (key in oldAttrs) {
+        if (!(key in attrs)) {
+            elm.removeAttribute(key);
+        }
+    }
+}
+exports.attributesModule = { create: updateAttrs, update: updateAttrs };
+exports.default = exports.attributesModule;
+//# sourceMappingURL=attributes.js.map
+
+/***/ }),
+
 /***/ "./node_modules/snabbdom/modules/eventlisteners.js":
 /*!*********************************************************!*\
   !*** ./node_modules/snabbdom/modules/eventlisteners.js ***!
@@ -776,7 +842,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var snabbdom__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! snabbdom */ "./node_modules/snabbdom/es/snabbdom.js");
 
 
-const patch = snabbdom__WEBPACK_IMPORTED_MODULE_0__["init"]([__webpack_require__(/*! snabbdom/modules/eventlisteners */ "./node_modules/snabbdom/modules/eventlisteners.js").default]);
+const patch = snabbdom__WEBPACK_IMPORTED_MODULE_0__["init"]([__webpack_require__(/*! snabbdom/modules/eventlisteners */ "./node_modules/snabbdom/modules/eventlisteners.js").default, __webpack_require__(/*! snabbdom/modules/attributes */ "./node_modules/snabbdom/modules/attributes.js").default]);
 const container = document.getElementById('notesContainer'); // Holds the active window id when it is focused
 
 let activeWindowId;
@@ -871,11 +937,31 @@ async function buildSidePanelNotes(notes) {
       on: {
         click: [editNote, index]
       }
-    }, 'edit'), Object(snabbdom__WEBPACK_IMPORTED_MODULE_0__["h"])('a.note-tools--delete', {
+    }, [Object(snabbdom__WEBPACK_IMPORTED_MODULE_0__["h"])('svg', {
+      attrs: {
+        width: 24,
+        height: 24,
+        viewBox: '0 0 24 24'
+      }
+    }, [Object(snabbdom__WEBPACK_IMPORTED_MODULE_0__["h"])('use', {
+      attrs: {
+        'xlink:href': "#edit"
+      }
+    })])]), Object(snabbdom__WEBPACK_IMPORTED_MODULE_0__["h"])('a.note-tools--delete', {
       on: {
         click: [deleteNote, index]
       }
-    }, 'delete')])])]);
+    }, [Object(snabbdom__WEBPACK_IMPORTED_MODULE_0__["h"])('svg', {
+      attrs: {
+        width: 24,
+        height: 24,
+        viewBox: '0 0 24 24'
+      }
+    }, [Object(snabbdom__WEBPACK_IMPORTED_MODULE_0__["h"])('use', {
+      attrs: {
+        'xlink:href': "#delete"
+      }
+    })])])])])]);
   });
 }
 
@@ -892,7 +978,7 @@ async function deleteNote(noteIndex) {
       type: 'delete-note',
       body: {
         _id: url,
-        noteIndex
+        index: noteIndex
       }
     });
   }
