@@ -22,6 +22,11 @@ browser
         break;
       }
 
+      case 'delete-note': {
+        deleteNote(message.body);
+        break;
+      }
+
     }
   });
 
@@ -83,4 +88,8 @@ browser.contextMenus.create({
 // Functions to handle events
 function createNewNote(note) {
   notaExtensionDb.createNote(note);
+}
+
+function deleteNote(note) {
+  notaExtensionDb.deleteNote(note);
 }

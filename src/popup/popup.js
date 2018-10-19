@@ -37,6 +37,7 @@ browser.runtime.sendMessage({
 
       // Update the tags set
       tags = new Set(responseWithNote.tags);
+      updateTagsListDOM();
 
       // Text area and type of highlight are in the form element
       updateFormWithNoteInformation(responseWithNote)
@@ -124,17 +125,23 @@ function updateTagsListDOM() {
   tagsList.innerHTML = tagsElems;
 }
 
-function updateTagsList(event) {
-	if (!tags.has(event.target.value)) {
-		tags.add(event.target.value);
-    updateTagsListDOM();
-    event.target.value = '';
-  }
-  return false;
+function addTagToTheList(event) {
+  tags.add(event.target.value);
+  event.target.value = '';
+  updateTagsListDOM();
 }
 
-tagsInput.addEventListener('change', updateTagsList);
-tagsInput.addEventListener('select', updateTagsList);
+function removeTagFromTheList(tag) {
+  tags.delete(tag);
+  updateTagsListDOM();
+}
+
+tagsInput.addEventListener('change', addTagToTheList);
+tagsInput.addEventListener('select', addTagToTheList);
+tagsList.addEventListener('click', (event) => {
+  const tagName = event.target.textContent.substring(1);
+  removeTagFromTheList(tagName);
+})
 
 function notifyUser(msg) {
   notification.className = `notify-${msg.type}`;

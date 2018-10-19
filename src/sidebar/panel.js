@@ -119,7 +119,15 @@ function editNote(noteIndex) {
   browser.browserAction.openPopup();
 }
 
-function deleteNote(noteIndex) {
-  console.log('delete ', noteIndex)
-  alert('are you sure?')
+async function deleteNote(noteIndex) {
+  const url = await retrieveActiveTabURL();
+  if (window.confirm(`Are you sure you want to delete this note?`)) {
+    browser.runtime.sendMessage({
+      type: 'delete-note',
+      body: {
+        _id: url,
+        noteIndex
+      }
+    });
+  }
 }

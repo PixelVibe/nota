@@ -160,3 +160,14 @@ h1,h2 {
 .notify-error {
   color: #cc0606;
 }
+
+.tag {
+  font-size: 16px;
+  margin-right: 4px;
+  cursor: pointer;
+  transition: color .2s ease-out;
+}
+
+.tag:hover {
+  color: #cc0606;
+}

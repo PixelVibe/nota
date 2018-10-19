@@ -30,7 +30,6 @@ export default class Storage {
   async createNote(document) {
     try {
       const existingDoc = await this.retrieveNotesForUrl(document._id);
-      console.log(document.editingInfo);
       if (document.editingInfo.isEditing) {
         existingDoc.notes.splice(document.editingInfo.index, 1, document.notes[0]);
       } else {
@@ -76,8 +75,21 @@ export default class Storage {
   }
 
   // Delete notes
-  deleteNotes(noteIndex) {
-    // 
+  async deleteNote(noteInfo) {
+    try {
+      const document = await this.retrieveNotesForUrl(noteInfo._id);
+      document.notes.splice(noteInfo.index, 1);
+      const result = await this.db.put(document);
+      // Notify areas that need to be updated like the side panel and the extension page
+      browser.runtime.sendMessage({
+        type: 'refresh-content',
+        body: {
+          id: result.id,
+        }
+      });
+    } catch (error) {
+      console.log('there was an error while trying to delete the note', error);
+    }
   }
 
   // Sync with remote?
