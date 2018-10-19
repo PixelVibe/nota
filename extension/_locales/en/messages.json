@@ -1,0 +1,26 @@
+{
+  "extensionName": {
+    "message": "Nota",
+    "description": "takes notes?"
+  },
+
+  "extensionDescription": {
+    "message": "Demonstrates the menus API.",
+    "description": "Description of the add-on."
+  },
+
+  "contextMenuItemHighlightInteresting": {
+    "message": "Interesting",
+    "description": "Description of the add-on."
+  },
+
+  "contextMenuItemHighlightReview": {
+    "message": "Review",
+    "description": "Description of the add-on."
+  },
+
+  "contextMenuItemHighlightOther": {
+    "message": "Note",
+    "description": "Description of the add-on."
+  }
+}

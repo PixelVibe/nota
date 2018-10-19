@@ -1,0 +1,25 @@
+{
+  "name": "nota",
+  "version": "1.0.0",
+  "description": "A web extension to annotate and keep notes and references from interesting readings.",
+  "scripts": {
+    "build": "webpack -w --display-error-details --progress --colors --mode development",
+    "start": "web-ext run -s extension/"
+  },
+  "author": "Nikolaos Kapatos",
+  "license": "MPL-2.0",
+  "devDependencies": {
+    "@babel/core": "^7.1.2",
+    "@babel/plugin-proposal-class-properties": "^7.1.0",
+    "@babel/preset-env": "^7.1.0",
+    "@types/pouchdb": "^6.3.2",
+    "babel-loader": "^8.0.4",
+    "web-ext": "^2.9.1",
+    "webpack": "^4.20.2",
+    "webpack-cli": "^3.1.2"
+  },
+  "dependencies": {
+    "pouchdb": "^7.0.0",
+    "snabbdom": "^0.7.2"
+  }
+}

@@ -1,0 +1,70 @@
+html, body {
+  height: 100%;
+  width: 100%;
+  margin: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font: caption;
+  background-color: rgb(250, 250, 250);
+}
+
+ul {
+  padding-inline-start: 0;
+  padding-inline-end: 10px;
+}
+
+ul li {
+  margin-block-start: 1em;
+  list-style-type: none;
+  border-left: 8px solid;
+  padding: 0.4em 0 0.4em 8px;
+}
+
+.note-type--other {
+  border-left-color: #0e68b7;
+}
+
+.note-type--review {
+  border-left-color: #902f72;
+}
+
+.note-type--interesting {
+  border-left-color: #fb6c0e;
+}
+
+.items-tags span {
+  margin-right: .4em;
+  color: #999;
+}
+
+.items-tags span:hover {
+  cursor: pointer;
+  color: #333;
+}
+
+
+/* fec60d
+
+3d9730 */
+
+/* p {
+  margin: 1em 2em;
+}
+
+#content {
+  height: 90%;
+  margin: 2em 2em 0 2em;
+  border: .5em solid #DDE4E9;
+  transition: background-color .2s ease-out;
+}
+
+#content[contenteditable=true] {
+  background-color: white;
+  transition: background-color .2s ease-in;
+}
+
+[contenteditable]:focus {
+  outline: 0px solid transparent;
+} */

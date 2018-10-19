@@ -1,0 +1,43 @@
+{
+  "manifest_version": 2,
+  "name": "__MSG_extensionName__",
+  "description": "__MSG_extensionDescription__",
+  "version": "1.0",
+  "default_locale": "en",
+
+  "permissions": ["tabs", "activeTab", "storage", "contextMenus", "webNavigation"],
+
+  "background": {
+    "scripts": [
+      "./global/index.js"
+    ]
+  },
+
+  "sidebar_action": {
+    "default_icon": {
+      "48": "./icons/baseline-book-black-48/1x/baseline_book_black_48dp.png",
+      "96": "./icons/baseline-book-black-48/2x/baseline_book_black_48dp.png"
+    },
+    "default_title": "Nota",
+    "default_panel": "./sidebar/panel.html"
+  },
+
+  "browser_action": {
+    "default_icon": {
+      "48": "./icons/baseline-book-white-48/1x/baseline_book_white_48dp.png",
+      "96": "./icons/baseline-book-white-48/2x/baseline_book_white_48dp.png"
+    },
+    "default_title": "Nota",
+    "default_popup": "popup/note.html",
+    "browser_style": true
+  },
+
+  "commands": {
+    "_execute_sidebar_action": {
+      "suggested_key": {
+        "default": "Ctrl+Shift+Y"
+      }
+    }
+  }
+
+}

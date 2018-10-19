@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8">
+    <link rel="stylesheet" href="popup.css"/>
+  </head>
+
+<body>
+  <div id="popup-content" class="content">
+    
+    <h3 class="content__lede">Save a new note!</h3>
+
+    <div class="contact-form__input-group">
+        
+      <label class="contact-form__label" for="note-tags">tags</label>
+      <input type="text" list="tags" class="contact-form__input contact-form__input--text" name="note-tags" id="note-tags">
+      
+      <datalist id="tags">
+        <option value="nodejs">
+        <option value="js">
+        <option value="tutorial">
+        <option value="something">
+      </datalist>
+      
+      <div class="tags-list" id="tags-list"></div>
+      
+    </div>
+  
+    <form action="#" id="new-note-form" class="content__form contact-form">
+  
+      <div class="contact-form__input-group">
+        <label class="contact-form__label" for="noteContent">Note</label>
+        <textarea class="contact-form__input contact-form__input--textarea" name="note-content" id="noteContent" cols="30" rows="10"></textarea>
+        <input type="radio" checked=true value="interesting" name="note-type" id="note-type--interesting" class="contact-form__input contact-form__input--radio">
+        <label for="note-type--interesting" class="contact-form__label contact-form__label--radio">Interesting</label>
+
+        <input type="radio" value="review" name="note-type" id="note-type--review" class="contact-form__input contact-form__input--radio">
+        <label for="note-type--review" class="contact-form__label contact-form__label--radio">Review</label>
+
+        <input type="radio" value="other" name="note-type" id="note-type--other" class="contact-form__input contact-form__input--radio">
+        <label for="note-type--other" class="contact-form__label contact-form__label--radio">Other</label>
+      </div>
+  
+      <button class="contact-form__button" id="note-save" type="submit">save</button>
+    </form>
+  
+    <div id="notifyUser" class="hidden"></div>
+
+  </div>
+  <div id="error-content" class="hidden">
+    <p>There was something wrong while trying to save the content!</p>
+  </div>
+  <script src="popup.js"></script>
+</body>
+
+</html>
