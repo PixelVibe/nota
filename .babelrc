@@ -4,8 +4,7 @@
         "targets": {
             "firefox": 57
         }
-    }],
-    "@babel/preset-react"
+    }]
   ],
   "plugins": [
     "@babel/plugin-proposal-class-properties"
