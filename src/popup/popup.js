@@ -3,23 +3,45 @@ const notification = document.getElementById('notifyUser');
 const tagsInput = document.getElementById('note-tags');
 const tagsList = document.getElementById('tags-list');
 
-const tags = new Set();
+let tags = new Set();
 
+const editingInfo = {
+  isEditing: false,
+}
+
+// Notify that the popup is visible and use it to respond back with an "editing" note
+// message for example
 browser.runtime.sendMessage({
   type: 'popup-is-active'
 })
 .then(async (response) => {
   if (response.type && response.type === 'editing') {
+    
+    // Set a flag to read it in our event listener when it receives the message for a new note
+    editingInfo.isEditing = true;
     try {
-      const url = await retrieveUrlForTheActiveTab();
+      // We need it to get the URL
+      const tab = await getActiveTab();
+      
+      // Keep some info for the editing note, so that we can send it over
+      // when submiting the form
+      editingInfo.url = tab[0].url;
+      editingInfo.index = response.noteIndex;
+      
+      // The response is a single object from the notes array.
       const responseWithNote = await browser.runtime.sendMessage({
         type: 'fetch-notes-for-active-tab-url',
-        docId: url[0].url,
-        noteIndex: response.noteIndex,
+        docId: editingInfo.url,
+        noteIndex: editingInfo.index,
       });
-      console.log(responseWithNote);
+
+      // Update the tags set
+      tags = new Set(responseWithNote.tags);
+
+      // Text area and type of highlight are in the form element
+      updateFormWithNoteInformation(responseWithNote)
     } catch (error) {
-      console.log('skata ', error);
+      console.log(error);
     }
   }
 })
@@ -47,7 +69,7 @@ form.addEventListener('submit', (elem) => {
   submitForm(formDataJson);
 })
 
-function retrieveUrlForTheActiveTab() {
+function getActiveTab() {
   return browser
     .windows
     .getCurrent()
@@ -60,12 +82,13 @@ function retrieveUrlForTheActiveTab() {
 }
 
 async function submitForm(formDataJson) {
-  const currentTab = await retrieveUrlForTheActiveTab();
+  const currentTab = await getActiveTab();
   const _id = currentTab[0].url;
 
   try {
     await browser.runtime.sendMessage({
       type: 'new-note',
+      editingInfo,
       body: {
         _id,
         notes: [{
@@ -86,6 +109,7 @@ async function submitForm(formDataJson) {
   }
 }
 
+// Go through the tags set and create the dom elements for display
 function updateTagsListDOM() {
   const tagsElems = Array.from(tags)
     .filter((item) => item.toString().trim() !== '')
@@ -114,12 +138,28 @@ function notifyUser(msg) {
 
   if (msg.type === 'error') {
     notification.innerText = `${msg.body}
-please open an issue ticket describing your steps and
-paste the following message as well
-↓
+    please open an issue ticket describing your steps and
+    paste the following message as well
+    ↓
 
-${msg.payload}`;
+    ${msg.payload}`;
   } else {
     notification.innerText = msg.body;
   }
+}
+
+function updateFormWithNoteInformation(note) {
+  [...form.elements].forEach((elem) => {
+    switch (elem.name) {
+      case 'note-content': {
+        elem.innerText = note.text;
+        break;
+      }
+
+      case 'note-type': {
+        elem.value === note.type ? elem.checked = true : elem.checked = false;
+        break;
+      }
+    }
+  })
 }
