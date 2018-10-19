@@ -1,17 +1,16 @@
 import Storage from './Storage';
 
 const notaExtensionDb = new Storage('notaExtensionDb');
-let editing = false;
 
 browser
   .runtime
   .onMessage
-  .addListener((msg) => {
-    switch (msg.type) {
+  .addListener((message) => {
+    switch (message.type) {
       case 'fetch-notes-for-active-tab-url': {
         try {
-          let noteIndexToRetrieve = msg.noteIndex ? msg.noteIndex : false;
-          return notaExtensionDb.retrieveNotesForUrl(msg.docId, noteIndexToRetrieve);
+          let noteIndexToRetrieve = message.noteIndex > -1 ? message.noteIndex : false;
+          return notaExtensionDb.retrieveNotesForUrl(message.docId, noteIndexToRetrieve);
         } catch (error) {
           console.log('Error while fetching notes ', error);
         }
@@ -19,13 +18,8 @@ browser
       }
 
       case 'new-note': {
-        createNewNote(msg.body);
+        createNewNote(message.body);
         break;
-      }
-
-      case 'edit-note': {
-        editing = msg.body;
-        return Promise.resolve();
       }
 
     }
@@ -52,6 +46,9 @@ browser.contextMenus.onClicked.addListener((contextMenuItem, tab) => {
 
   const note = {
     _id: contextMenuItem.pageUrl,
+    editingInfo: {
+      isEditing: false
+    },
     notes: [{
       text: contextMenuItem.selectionText,
       type, tags: []
@@ -86,8 +83,4 @@ browser.contextMenus.create({
 // Functions to handle events
 function createNewNote(note) {
   notaExtensionDb.createNote(note);
-}
-
-function editNote(id = null, position = -1) {
-
 }

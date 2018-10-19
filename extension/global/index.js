@@ -12227,8 +12227,8 @@ class Storage {
   } // Retrieve single
 
 
-  retrieveNotesForUrl(id, index) {
-    if (index) {
+  retrieveNotesForUrl(id, index = false) {
+    if (index !== false) {
       return this.db.get(id).then(results => results.notes[index]);
     } else {
       return this.db.get(id);
@@ -12236,11 +12236,16 @@ class Storage {
   } // Put single
 
 
-  async createNote(note) {
+  async createNote(document) {
     try {
-      const existingDoc = await this.retrieveNotesForUrl(note._id);
-      const newNotes = [...existingDoc.notes, ...note.notes];
-      existingDoc.notes = newNotes;
+      const existingDoc = await this.retrieveNotesForUrl(document._id);
+      console.log(document.editingInfo);
+
+      if (document.editingInfo.isEditing) {
+        existingDoc.notes.splice(document.editingInfo.index, 1, document.notes[0]);
+      } else {
+        existingDoc.notes.push(document.notes[0]);
+      }
 
       try {
         const result = await this.db.put(existingDoc); // Notify areas that need to be updated like the side panel and the extension page
@@ -12251,12 +12256,14 @@ class Storage {
             id: result.id
           }
         });
-      } catch (error) {}
+      } catch (error) {
+        console.log('error while trying to update a document', error);
+      }
     } catch (error) {
       // If it is missing create a new one
       if (error.status === 404) {
         try {
-          const result = await this.db.put(note); // Notify areas that need to be updated like the side panel and the extension page
+          const result = await this.db.put(document); // Notify areas that need to be updated like the side panel and the extension page
 
           browser.runtime.sendMessage({
             type: 'refresh-content',
@@ -12298,14 +12305,13 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _Storage__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./Storage */ "./src/global/Storage.js");
 
 const notaExtensionDb = new _Storage__WEBPACK_IMPORTED_MODULE_0__["default"]('notaExtensionDb');
-let editing = false;
-browser.runtime.onMessage.addListener(msg => {
-  switch (msg.type) {
+browser.runtime.onMessage.addListener(message => {
+  switch (message.type) {
     case 'fetch-notes-for-active-tab-url':
       {
         try {
-          let noteIndexToRetrieve = msg.noteIndex ? msg.noteIndex : false;
-          return notaExtensionDb.retrieveNotesForUrl(msg.docId, noteIndexToRetrieve);
+          let noteIndexToRetrieve = message.noteIndex > -1 ? message.noteIndex : false;
+          return notaExtensionDb.retrieveNotesForUrl(message.docId, noteIndexToRetrieve);
         } catch (error) {
           console.log('Error while fetching notes ', error);
         }
@@ -12315,14 +12321,8 @@ browser.runtime.onMessage.addListener(msg => {
 
     case 'new-note':
       {
-        createNewNote(msg.body);
+        createNewNote(message.body);
         break;
-      }
-
-    case 'edit-note':
-      {
-        editing = msg.body;
-        return Promise.resolve();
       }
   }
 }); // Context menu
@@ -12352,6 +12352,9 @@ browser.contextMenus.onClicked.addListener((contextMenuItem, tab) => {
 
   const note = {
     _id: contextMenuItem.pageUrl,
+    editingInfo: {
+      isEditing: false
+    },
     notes: [{
       text: contextMenuItem.selectionText,
       type,
@@ -12382,8 +12385,6 @@ browser.contextMenus.create({
 function createNewNote(note) {
   notaExtensionDb.createNote(note);
 }
-
-function editNote(id = null, position = -1) {}
 
 /***/ })
 

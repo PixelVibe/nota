@@ -99,8 +99,8 @@ const tagsInput = document.getElementById('note-tags');
 const tagsList = document.getElementById('tags-list');
 let tags = new Set();
 const editingInfo = {
-  isEditing: false // Notify that the popup is visible and use it to respond back with an "editing" note
-  // message for example
+  isEditing: false // Notify that the popup is visible and use it in other parts of the extension
+  // to respond back with an "editing" note message for example!
 
 };
 browser.runtime.sendMessage({
@@ -132,7 +132,11 @@ browser.runtime.sendMessage({
     }
   }
 }).catch(error => {
-  console.log('error');
+  // Catch error that might occur because there is no response when the pop up
+  // sends the message that is active
+  if (!error instanceof TypeError && !error.message == 'response is undefined') {
+    console.log(error);
+  }
 });
 form.addEventListener('submit', elem => {
   elem.preventDefault();
@@ -144,7 +148,7 @@ form.addEventListener('submit', elem => {
     return acc;
   }, {});
 
-  if (formDataJson.noteContent === '') {
+  if (formDataJson['note-content'] === '') {
     notifyUser({
       type: 'info',
       body: 'Hey, you need to add some content at least!'
@@ -172,8 +176,8 @@ async function submitForm(formDataJson) {
   try {
     await browser.runtime.sendMessage({
       type: 'new-note',
-      editingInfo,
       body: {
+        editingInfo,
         _id,
         notes: [{
           text: formDataJson['note-content'],

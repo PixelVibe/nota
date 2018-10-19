@@ -804,10 +804,14 @@ browser.runtime.onMessage.addListener(msg => {
 
     case 'popup-is-active':
       {
-        return Promise.resolve({
-          type: 'editing',
-          noteIndex: editingNote
-        });
+        if (editingNote > -1) {
+          const noteIndex = editingNote;
+          editingNote = -1;
+          return Promise.resolve({
+            type: 'editing',
+            noteIndex
+          });
+        }
       }
   }
 }); // It will return the URL for the active tab in the focused window instance
