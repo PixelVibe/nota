@@ -724,6 +724,42 @@ exports.default = exports.attributesModule;
 
 /***/ }),
 
+/***/ "./node_modules/snabbdom/modules/class.js":
+/*!************************************************!*\
+  !*** ./node_modules/snabbdom/modules/class.js ***!
+  \************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", { value: true });
+function updateClass(oldVnode, vnode) {
+    var cur, name, elm = vnode.elm, oldClass = oldVnode.data.class, klass = vnode.data.class;
+    if (!oldClass && !klass)
+        return;
+    if (oldClass === klass)
+        return;
+    oldClass = oldClass || {};
+    klass = klass || {};
+    for (name in oldClass) {
+        if (!klass[name]) {
+            elm.classList.remove(name);
+        }
+    }
+    for (name in klass) {
+        cur = klass[name];
+        if (cur !== oldClass[name]) {
+            elm.classList[cur ? 'add' : 'remove'](name);
+        }
+    }
+}
+exports.classModule = { create: updateClass, update: updateClass };
+exports.default = exports.classModule;
+//# sourceMappingURL=class.js.map
+
+/***/ }),
+
 /***/ "./node_modules/snabbdom/modules/eventlisteners.js":
 /*!*********************************************************!*\
   !*** ./node_modules/snabbdom/modules/eventlisteners.js ***!
@@ -842,7 +878,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var snabbdom__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! snabbdom */ "./node_modules/snabbdom/es/snabbdom.js");
 
 
-const patch = snabbdom__WEBPACK_IMPORTED_MODULE_0__["init"]([__webpack_require__(/*! snabbdom/modules/eventlisteners */ "./node_modules/snabbdom/modules/eventlisteners.js").default, __webpack_require__(/*! snabbdom/modules/attributes */ "./node_modules/snabbdom/modules/attributes.js").default]);
+const patch = snabbdom__WEBPACK_IMPORTED_MODULE_0__["init"]([__webpack_require__(/*! snabbdom/modules/eventlisteners */ "./node_modules/snabbdom/modules/eventlisteners.js").default, __webpack_require__(/*! snabbdom/modules/attributes */ "./node_modules/snabbdom/modules/attributes.js").default, __webpack_require__(/*! snabbdom/modules/class */ "./node_modules/snabbdom/modules/class.js").default]);
 const container = document.getElementById('notesContainer'); // Holds the active window id when it is focused
 
 let activeWindowId;
@@ -931,13 +967,21 @@ async function refreshContent() {
 
 async function buildSidePanelNotes(notes) {
   return notes.map((note, index) => {
-    return Object(snabbdom__WEBPACK_IMPORTED_MODULE_0__["h"])(`li.note-type--${note.type}`, {}, [Object(snabbdom__WEBPACK_IMPORTED_MODULE_0__["h"])('div.note-content', {}, [Object(snabbdom__WEBPACK_IMPORTED_MODULE_0__["h"])('p', {}, note.text), Object(snabbdom__WEBPACK_IMPORTED_MODULE_0__["h"])('div.note-tags', {}, note.tags.map(tag => {
+    let trimText = note.text.length > 300;
+    return Object(snabbdom__WEBPACK_IMPORTED_MODULE_0__["h"])(`li.note-type--${note.type}`, {
+      class: {
+        'trimmed-text': trimText
+      },
+      on: {
+        click: captureClickEvents
+      }
+    }, [Object(snabbdom__WEBPACK_IMPORTED_MODULE_0__["h"])('div.note-content', {}, [Object(snabbdom__WEBPACK_IMPORTED_MODULE_0__["h"])('p', {}, trimText ? [Object(snabbdom__WEBPACK_IMPORTED_MODULE_0__["h"])('span.visible-text', {}, `${note.text.slice(0, 300)}...`), Object(snabbdom__WEBPACK_IMPORTED_MODULE_0__["h"])('span.hidden-text-fragment', {}, note.text.slice(300))] : Object(snabbdom__WEBPACK_IMPORTED_MODULE_0__["h"])('span', {}, note.text)), Object(snabbdom__WEBPACK_IMPORTED_MODULE_0__["h"])('div.note-tags', {}, note.tags.map(tag => {
       return Object(snabbdom__WEBPACK_IMPORTED_MODULE_0__["h"])('span', `#${tag}`);
-    })), Object(snabbdom__WEBPACK_IMPORTED_MODULE_0__["h"])('div.note-tools', {}, [Object(snabbdom__WEBPACK_IMPORTED_MODULE_0__["h"])('a.note-tools--edit', {
+    }))]), Object(snabbdom__WEBPACK_IMPORTED_MODULE_0__["h"])('div.note-tools', {}, [Object(snabbdom__WEBPACK_IMPORTED_MODULE_0__["h"])('a.note-tools--edit', {
       on: {
         click: [editNote, index]
       }
-    }, [Object(snabbdom__WEBPACK_IMPORTED_MODULE_0__["h"])('svg', {
+    }, [Object(snabbdom__WEBPACK_IMPORTED_MODULE_0__["h"])('svg.edit', {
       attrs: {
         width: 24,
         height: 24,
@@ -947,11 +991,35 @@ async function buildSidePanelNotes(notes) {
       attrs: {
         'xlink:href': "#edit"
       }
+    })])]), Object(snabbdom__WEBPACK_IMPORTED_MODULE_0__["h"])('a.note-tools--fold', {
+      on: {
+        click: [toggleFoldText, index]
+      }
+    }, [Object(snabbdom__WEBPACK_IMPORTED_MODULE_0__["h"])('svg.more', {
+      attrs: {
+        width: 24,
+        height: 24,
+        viewBox: '0 0 24 24'
+      }
+    }, [Object(snabbdom__WEBPACK_IMPORTED_MODULE_0__["h"])('use', {
+      attrs: {
+        'xlink:href': "#more"
+      }
+    })]), Object(snabbdom__WEBPACK_IMPORTED_MODULE_0__["h"])('svg.less', {
+      attrs: {
+        width: 24,
+        height: 24,
+        viewBox: '0 0 24 24'
+      }
+    }, [Object(snabbdom__WEBPACK_IMPORTED_MODULE_0__["h"])('use', {
+      attrs: {
+        'xlink:href': "#less"
+      }
     })])]), Object(snabbdom__WEBPACK_IMPORTED_MODULE_0__["h"])('a.note-tools--delete', {
       on: {
         click: [deleteNote, index]
       }
-    }, [Object(snabbdom__WEBPACK_IMPORTED_MODULE_0__["h"])('svg', {
+    }, [Object(snabbdom__WEBPACK_IMPORTED_MODULE_0__["h"])('svg.delete', {
       attrs: {
         width: 24,
         height: 24,
@@ -961,7 +1029,7 @@ async function buildSidePanelNotes(notes) {
       attrs: {
         'xlink:href': "#delete"
       }
-    })])])])])]);
+    })])])])]);
   });
 }
 
@@ -981,6 +1049,41 @@ async function deleteNote(noteIndex) {
         index: noteIndex
       }
     });
+  }
+}
+
+function toggleFoldText(_itemIndex, event, node) {
+  // event.cancelBubble = true;
+  if (event.target.tagName !== 'A') {
+    event.cancelBubble = true;
+    node.elm.dispatchEvent(new Event('click', {
+      bubbles: true
+    }));
+    return;
+  } // console.log(event.bubbles);
+  // console.log(node.elm);
+  // console.log(node);
+  // if (event.target.tagName)
+  // event.cancelBubble = true
+  // // console.log(event);
+  // console.log(itemIndex)
+  // console.log(event)
+  // console.log(b)
+
+}
+
+function captureClickEvents(event, node) {
+  switch (event.target.className) {
+    case 'note-tools--fold':
+      {
+        node.elm.classList.toggle('unfolded');
+        break;
+      }
+
+    default:
+      {
+        return;
+      }
   }
 }
 

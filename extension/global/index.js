@@ -12212,7 +12212,7 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
 // notes: [{
 //   text: string,
 //   type: string,
-//   tags: [] string,
+//   tags: string[],
 // }]
 
 class Storage {

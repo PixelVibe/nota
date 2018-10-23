@@ -4,7 +4,7 @@ import PouchDb from 'pouchdb'
 // notes: [{
 //   text: string,
 //   type: string,
-//   tags: [] string,
+//   tags: string[],
 // }]
 
 export default class Storage {

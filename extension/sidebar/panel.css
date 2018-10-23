@@ -12,14 +12,19 @@ body {
 
 ul {
   padding-inline-start: 0;
-  padding-inline-end: 10px;
 }
 
 ul li {
   margin-block-start: 1em;
   list-style-type: none;
   border-left: 8px solid;
-  padding: 0.4em 0 0.4em 8px;
+  padding-left: 8px;
+  display: flex;
+  flex-direction: row;
+}
+
+ul li p {
+  margin-top: 0;
 }
 
 .note-type--other {
@@ -34,16 +39,79 @@ ul li {
   border-left-color: #fb6c0e;
 }
 
-.items-tags span {
+.note-tags span {
   margin-right: .4em;
   color: #999;
+  transition: color .2s ease-in;
+  cursor: pointer;
 }
 
-.items-tags span:hover {
+.note-content {
+  padding-right: 8px;
+  flex: 1;
+}
+
+.note-tools {
+  background: rgb(241, 241, 241);
+  padding: 2px;
+}
+
+.note-tools svg {
+  fill: #999;
+  transition: fill .2s ease-in;
+}
+
+.note-tools a {
   cursor: pointer;
+  border-bottom: 1px dotted #999;
+  width: 20px;
+  padding: 4px 0;
+  display: block;
+}
+
+.note-tools a:last-child {
+  border: 0 none;
+}
+
+.note-tools a svg {
+  width: inherit;
+  height: inherit;
+}
+
+.note-tools--edit:hover svg {
+  fill: #a23eff;
+}
+
+.note-tools--delete:hover svg {
+  fill: #d60427;
+}
+
+.note-tags span:hover {
   color: #333;
 }
 
+.hidden-text-fragment,
+.hidden,
+.note-tools--fold {
+  display: none;
+}
+
+svg.less {
+  display: none;
+}
+
+.unfolded svg.less,
+.unfolded .hidden-text-fragment {
+  display: inline;
+}
+
+.unfolded svg.more {
+  display: none;
+}
+
+.trimmed-text .note-tools--fold {
+  display: block;
+}
 
 /* fec60d
 

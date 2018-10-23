@@ -3,7 +3,8 @@ import { h } from 'snabbdom';
 
 const patch = snabbdom.init([
   require('snabbdom/modules/eventlisteners').default,
-  require('snabbdom/modules/attributes').default
+  require('snabbdom/modules/attributes').default,
+  require('snabbdom/modules/class').default
 ]);
 const container = document.getElementById('notesContainer');
 
@@ -99,25 +100,37 @@ async function refreshContent() {
 // to be added from snabbdom
 async function buildSidePanelNotes(notes) {
   return notes.map((note, index) => {
+    let trimText = note.text.length > 300;
     return (
-      h(`li.note-type--${note.type}`, {}, [
+      h(`li.note-type--${note.type}`, {class: {'trimmed-text' : trimText}, on: {click: captureClickEvents}}, [
         h('div.note-content', {}, [
-          h('p', {}, note.text),
+          h('p', {}, 
+            trimText ? [h('span.visible-text', {}, `${note.text.slice(0, 300)}...`), h('span.hidden-text-fragment', {}, note.text.slice(300))] : h('span', {}, note.text)
+          ),
           h('div.note-tags', {}, note.tags.map((tag) => {
             return h('span', `#${tag}`)
           })),
-          h('div.note-tools', {}, [
-            h('a.note-tools--edit', { on: { click: [editNote, index] } }, [
-              h('svg', { attrs: { width: 24, height: 24, viewBox: '0 0 24 24' } }, [
-                h('use', { attrs: { 'xlink:href': "#edit" } })
-              ])
+        ]),
+        h('div.note-tools', {}, [
+          h('a.note-tools--edit', { on: { click: [editNote, index] } }, [
+            h('svg.edit', { attrs: { width: 24, height: 24, viewBox: '0 0 24 24' } }, [
+              h('use', { attrs: { 'xlink:href': "#edit" } })
+            ])
+          ]),
+          h('a.note-tools--fold', { on: { click: [toggleFoldText, index] } }, [
+            h('svg.more', { attrs: { width: 24, height: 24, viewBox: '0 0 24 24' } }, [
+              h('use', { attrs: { 'xlink:href': "#more" } })
             ]),
-            h('a.note-tools--delete', { on: { click: [deleteNote, index] } }, [
-              h('svg', { attrs: { width: 24, height: 24, viewBox: '0 0 24 24' } }, [
-                h('use', { attrs: { 'xlink:href': "#delete" } })
-              ])
-            ]),
-          ])])
+            h('svg.less', { attrs: { width: 24, height: 24, viewBox: '0 0 24 24' } }, [
+              h('use', { attrs: { 'xlink:href': "#less" } })
+            ])
+          ]),
+          h('a.note-tools--delete', { on: { click: [deleteNote, index] } }, [
+            h('svg.delete', { attrs: { width: 24, height: 24, viewBox: '0 0 24 24' } }, [
+              h('use', { attrs: { 'xlink:href': "#delete" } })
+            ])
+          ]),
+        ])
       ])
     )
   });
@@ -138,5 +151,37 @@ async function deleteNote(noteIndex) {
         index: noteIndex,
       }
     });
+  }
+}
+
+function toggleFoldText(_itemIndex, event, node) {
+  // event.cancelBubble = true;
+  if(event.target.tagName !== 'A') {
+    event.cancelBubble = true;
+    node.elm.dispatchEvent(new Event('click', {bubbles: true}));
+    return;
+  }
+  // console.log(event.bubbles);
+  // console.log(node.elm);
+  // console.log(node);
+  // if (event.target.tagName)
+  // event.cancelBubble = true
+  // // console.log(event);
+  
+  // console.log(itemIndex)
+  // console.log(event)
+  // console.log(b)
+}
+
+
+function captureClickEvents(event, node) {
+  switch(event.target.className) {
+    case 'note-tools--fold': {
+      node.elm.classList.toggle('unfolded');
+      break;
+    }
+    default: {
+      return;
+    }
   }
 }
