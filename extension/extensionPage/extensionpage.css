@@ -1,0 +1,164 @@
+html, body {
+  height: 100%;
+  width: 100%;
+  margin: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font: caption;
+  background-color: rgb(250, 250, 250);
+}
+
+ul {
+  padding-inline-start: 0;
+}
+
+ul li {
+  margin-block-start: 1em;
+  list-style-type: none;
+  border-left: 8px solid;
+  padding-left: 8px;
+  display: flex;
+  flex-direction: row;
+}
+
+ul li p {
+  margin-top: 0;
+}
+
+.note-type--other {
+  border-left-color: #0e68b7;
+}
+
+.note-type--review {
+  border-left-color: #902f72;
+}
+
+.note-type--interesting {
+  border-left-color: #fb6c0e;
+}
+
+.note-type--other .note-content {
+  background-color: #e8f4fd;
+}
+
+.note-type--review .note-content {
+  background-color: #f8e8f3;
+}
+
+.note-type--interesting .note-content {
+  background-color: #fff0e7;
+}
+
+.note-tags span {
+  margin-right: .4em;
+  color: #999;
+  transition: color .2s ease-in;
+  cursor: pointer;
+}
+
+.note-content {
+  padding: 10px;
+  flex: 1;
+}
+
+.note-tools {
+  background: rgb(241, 241, 241);
+  padding: 2px;
+}
+
+.note-tools svg {
+  fill: #999;
+  transition: fill .2s ease-in;
+}
+
+.note-tools a {
+  cursor: pointer;
+  border-bottom: 1px dotted #999;
+  width: 20px;
+  padding: 4px 0;
+  display: block;
+}
+
+.note-tools a:last-child {
+  border: 0 none;
+}
+
+.note-tools a svg {
+  width: inherit;
+  height: inherit;
+}
+
+.note-tools--edit:hover svg {
+  fill: #a23eff;
+}
+
+.note-tools--delete:hover svg {
+  fill: #d60427;
+}
+
+.note-tags span:hover,
+.note-tags span.selected {
+  color: #333;
+}
+
+.hidden-text-fragment,
+.hidden,
+a.note-tools--fold {
+  display: none;
+}
+
+svg.less {
+  display: none;
+}
+
+.unfolded svg.less,
+.unfolded .hidden-text-fragment {
+  display: inline;
+}
+
+.unfolded svg.more {
+  display: none;
+}
+
+.trimmed-text .note-tools--fold {
+  display: block;
+}
+
+.notesList {
+  margin-bottom: 50px;
+}
+
+h2 {
+  display: block;
+  background-color: #222;
+  color: #FFF;
+  margin: 0;
+  line-height: 3rem;
+  text-indent: 20px;
+}
+
+/* fec60d
+
+3d9730 */
+
+/* p {
+  margin: 1em 2em;
+}
+
+#content {
+  height: 90%;
+  margin: 2em 2em 0 2em;
+  border: .5em solid #DDE4E9;
+  transition: background-color .2s ease-out;
+}
+
+#content[contenteditable=true] {
+  background-color: white;
+  transition: background-color .2s ease-in;
+}
+
+[contenteditable]:focus {
+  outline: 0px solid transparent;
+} */

@@ -13,6 +13,7 @@ module.exports = {
     'options/options': './src/options/options.js',
     'global/index': './src/global/index.js',
     'contentScripts/index': './src/contentScripts/index.js',
+    'extensionPage/extensionpage': './src/extensionPage/extensionpage.js',
   },
   output: {
     // This copies each source entry into the extension dist folder named

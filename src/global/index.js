@@ -26,6 +26,12 @@ browser
         deleteNote(message.body);
         break;
       }
+
+      case 'open-extension-page': {
+        openExtensionPage();
+        break;
+      }
+
     }
   });
 
@@ -97,4 +103,15 @@ function createNewNote(note) {
 
 function deleteNote(note) {
   bjExtensionDb.deleteNote(note);
+}
+
+var createData = {
+  type: "detached_panel",
+  url: "./extensionPage/index.html",
+  width: 800,
+  height: 600
+};
+
+function openExtensionPage() {
+  var creating = browser.windows.create(createData);
 }

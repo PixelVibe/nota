@@ -64,9 +64,7 @@ async function refreshContent() {
 
   try {
     const doc = await browser.storage.local.get(url);
-
-
-
+    
     if (!doc[url]) {
       patch(vNode, h('ul', {}, [
         h('li', {}, 'There are no notes for this page!')
