@@ -81,45 +81,79 @@
 /******/
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = "./src/contextMenu/ContextMenu.js");
+/******/ 	return __webpack_require__(__webpack_require__.s = "./src/options/options.js");
 /******/ })
 /************************************************************************/
 /******/ ({
 
-/***/ "./src/contextMenu/ContextMenu.js":
-/*!****************************************!*\
-  !*** ./src/contextMenu/ContextMenu.js ***!
-  \****************************************/
+/***/ "./src/options/options.js":
+/*!********************************!*\
+  !*** ./src/options/options.js ***!
+  \********************************/
 /*! no static exports found */
 /***/ (function(module, exports) {
 
-browser.contextMenus.onClicked.addListener((info, tab) => {
-  console.log(info);
-  browser.runtime.sendMessage('la');
+const REDIRECT_URL = browser.identity.getRedirectURL();
+const CLIENT_ID = "e2f3f3z4u7dumch";
+const AUTH_URL = `https://www.dropbox.com/oauth2/authorize\
+?client_id=${CLIENT_ID}\
+&response_type=token\
+&redirect_uri=${encodeURIComponent(REDIRECT_URL)}`;
+
+function extractAccessToken(redirectUri) {
+  let m = redirectUri.match(/[#?](.*)/);
+  if (!m || m.length < 1) return null;
+  let params = new URLSearchParams(m[1].split("#")[0]);
+  return params.get("access_token");
+}
+
+function validate(redirectURL) {
+  // console.log(redirectURL);
+  const accessToken = extractAccessToken(redirectURL);
+
+  if (!accessToken) {
+    throw "Authorization failure";
+  }
+
+  browser.storage.sync.set({
+    token: accessToken
+  });
+}
+/**
+Authenticate and authorize using browser.identity.launchWebAuthFlow().
+If successful, this resolves with a redirectURL string that contains
+an access token.
+*/
+
+
+function authorize() {
+  return browser.identity.launchWebAuthFlow({
+    interactive: true,
+    url: AUTH_URL
+  });
+}
+
+function getAccessToken() {
+  authorize().then(validate).catch(error => {
+    console.log('error ', error);
+  });
+}
+
+const b = document.getElementById('connect');
+browser.storage.sync.get('token', res => {
+  if (res.token) {
+    b.innerText = 'You are authorized';
+    b.setAttribute('disabled', true);
+  }
+
+  ;
 });
-browser.contextMenus.create({
-  id: "highlight-interesting",
-  type: "normal",
-  title: browser.i18n.getMessage("contextMenuItemHighlightInteresting"),
-  contexts: ["selection"],
-  checked: false
-});
-browser.contextMenus.create({
-  id: "highlight-review",
-  type: "normal",
-  title: browser.i18n.getMessage("contextMenuItemHighlightReview"),
-  contexts: ["selection"],
-  checked: false
-});
-browser.contextMenus.create({
-  id: "highlight-other",
-  type: "normal",
-  title: browser.i18n.getMessage("contextMenuItemHighlightOther"),
-  contexts: ["selection"],
-  checked: false
+b.addEventListener('click', e => {
+  e.preventDefault();
+  getAccessToken();
 });
 
 /***/ })
 
 /******/ });
-//# sourceMappingURL=ContextMenu.js.map
+//# sourceMappingURL=options.js.map

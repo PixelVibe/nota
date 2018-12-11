@@ -92,7 +92,7 @@ ul li p {
 
 .hidden-text-fragment,
 .hidden,
-.note-tools--fold {
+a.note-tools--fold {
   display: none;
 }
 

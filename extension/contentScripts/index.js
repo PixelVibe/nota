@@ -81,45 +81,70 @@
 /******/
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = "./src/contextMenu/ContextMenu.js");
+/******/ 	return __webpack_require__(__webpack_require__.s = "./src/contentScripts/index.js");
 /******/ })
 /************************************************************************/
 /******/ ({
 
-/***/ "./src/contextMenu/ContextMenu.js":
-/*!****************************************!*\
-  !*** ./src/contextMenu/ContextMenu.js ***!
-  \****************************************/
+/***/ "./src/contentScripts/index.js":
+/*!*************************************!*\
+  !*** ./src/contentScripts/index.js ***!
+  \*************************************/
 /*! no static exports found */
 /***/ (function(module, exports) {
 
-browser.contextMenus.onClicked.addListener((info, tab) => {
-  console.log(info);
-  browser.runtime.sendMessage('la');
-});
-browser.contextMenus.create({
-  id: "highlight-interesting",
-  type: "normal",
-  title: browser.i18n.getMessage("contextMenuItemHighlightInteresting"),
-  contexts: ["selection"],
-  checked: false
-});
-browser.contextMenus.create({
-  id: "highlight-review",
-  type: "normal",
-  title: browser.i18n.getMessage("contextMenuItemHighlightReview"),
-  contexts: ["selection"],
-  checked: false
-});
-browser.contextMenus.create({
-  id: "highlight-other",
-  type: "normal",
-  title: browser.i18n.getMessage("contextMenuItemHighlightOther"),
-  contexts: ["selection"],
-  checked: false
-});
+const selection = window.getSelection();
+const selectionRange = selection.getRangeAt(0);
+
+function getToANormalNodeType(node) {
+  if (node.nodeType === 1) {
+    return {
+      nodeName: node.nodeName,
+      id: node.id,
+      classList: node.classList
+    };
+  } else {
+    return getToANormalNodeType(node.parentNode);
+  }
+}
+
+(async selectionRange => {
+  let rangeContainer = {}; // Check if we are in the same container
+
+  if (selectionRange.startContainer === selectionRange.endContainer) {
+    rangeContainer.startContainerParent = await getToANormalNodeType(selectionRange.startContainer);
+    rangeContainer.endContainerParent = false;
+  } else {
+    rangeContainer.startContainerParent = await getToANormalNodeType(selectionRange.startContainer);
+    rangeContainer.endContainerParent = await getToANormalNodeType(selectionRange.endContainer);
+  }
+
+  console.log(rangeContainer);
+})(selectionRange); // console.log(selectionRange);
+// (async (node) => {
+//   const nodeName = await getToANormalNodeType(node);
+//   // browser.runtime.sendMessage({
+//   //   type: 'selected-text',
+//   //   body: {
+//   //     nodeName
+//   //   },
+//   // });
+//   // console.log(result);
+
+
+var treeWalker = document.createNodeIterator(document.body, NodeFilter.SHOW_ELEMENT, {
+  acceptNode: function (node) {
+    return node.nodeName === nodeName;
+  }
+}, false);
+var nodeList = [];
+
+while (treeWalker.nextNode()) nodeList.push(treeWalker.currentNode); //   console.log(nodeList);
+//   // nodeList.filter((node) => {node.textContent.includes("A data type provides a set of values from which an ")})
+// })(selection.anchorNode);
+// console.log(selection);
 
 /***/ })
 
 /******/ });
-//# sourceMappingURL=ContextMenu.js.map
+//# sourceMappingURL=index.js.map

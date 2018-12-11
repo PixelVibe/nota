@@ -5,7 +5,14 @@
   "version": "1.0",
   "default_locale": "en",
 
-  "permissions": ["tabs", "activeTab", "storage", "contextMenus", "webNavigation"],
+  "applications": {
+    "gecko": {
+      "id": "brain@jots.com",
+      "strict_min_version": "60.0"
+    }
+  },
+
+  "permissions": ["tabs", "activeTab", "contextMenus", "webNavigation", "identity", "storage"],
 
   "background": {
     "scripts": [
@@ -29,7 +36,8 @@
     },
     "default_title": "Nota",
     "default_popup": "popup/note.html",
-    "browser_style": true
+    "browser_style": true,
+    "chrome_style": true
   },
 
   "commands": {
@@ -38,6 +46,12 @@
         "default": "Ctrl+Shift+Y"
       }
     }
+  },
+
+  "options_ui": {
+    "page": "options/index.html",
+    "browser_style": true,
+    "chrome_style": true
   }
 
 }
