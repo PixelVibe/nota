@@ -11,6 +11,7 @@ const container = document.getElementById('notesContainer');
 // Holds the active window id when it is focused
 let activeWindowId;
 let editingNote = -1;
+let filteringTag = '';
 
 const vNode = h('ul', {}, '');
 patch(container, vNode);
@@ -64,6 +65,8 @@ async function refreshContent() {
   try {
     const doc = await browser.storage.local.get(url);
 
+
+
     if (!doc[url]) {
       patch(vNode, h('ul', {}, [
         h('li', {}, 'There are no notes for this page!')
@@ -86,7 +89,7 @@ async function refreshContent() {
 // Iterates an array of objects and returns a tree of hyperscript nodes
 // to be added from snabbdom
 async function buildSidePanelNotes(notes) {
-  return notes.map((note, index) => {
+  return notes.filter(note => !(filteringTag !== '' && !~note.tags.indexOf(filteringTag))).map((note, index) => {
     let trimText = note.text.length > 300;
     return (
       h(`li.note-type--${note.type}`, {class: {'trimmed-text' : trimText}, on: {click: captureClickEvents}}, [
@@ -95,7 +98,7 @@ async function buildSidePanelNotes(notes) {
             trimText ? [h('span.visible-text', note.text.slice(0, 300)), h('span.hidden-text-fragment', note.text.slice(300))] : h('span', note.text)
           ),
           h('div.note-tags', {}, note.tags.map((tag) => {
-            return h('span', `#${tag}`)
+            return h('span', { on: { click: [filterNotesWithTag, tag] }, class: {'selected' : tag === filteringTag} }, `#${tag}`)
           })),
         ]),
         h('div.note-tools', {}, [
@@ -121,6 +124,11 @@ async function buildSidePanelNotes(notes) {
       ])
     )
   });
+}
+
+function filterNotesWithTag(tag) {
+  filteringTag = filteringTag === tag ? '' : tag;
+  refreshContent();
 }
 
 function editNote(noteIndex, event) {
@@ -150,7 +158,6 @@ function toggleFoldText(_noteIndex, event, node) {
     return;
   }
 }
-
 
 function captureClickEvents(event, node) {
   switch(event.target.className) {

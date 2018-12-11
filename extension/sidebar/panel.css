@@ -86,7 +86,8 @@ ul li p {
   fill: #d60427;
 }
 
-.note-tags span:hover {
+.note-tags span:hover,
+.note-tags span.selected {
   color: #333;
 }
 

@@ -883,6 +883,7 @@ const container = document.getElementById('notesContainer'); // Holds the active
 
 let activeWindowId;
 let editingNote = -1;
+let filteringTag = '';
 const vNode = Object(snabbdom__WEBPACK_IMPORTED_MODULE_0__["h"])('ul', {}, '');
 patch(container, vNode); // Any changes to the URL will trigger this when the page has been fully loaded
 // Initially it was with tabs.onUpdated, but it was triggering multiple times
@@ -951,7 +952,7 @@ async function refreshContent() {
 
 
 async function buildSidePanelNotes(notes) {
-  return notes.map((note, index) => {
+  return notes.filter(note => !(filteringTag !== '' && !~note.tags.indexOf(filteringTag))).map((note, index) => {
     let trimText = note.text.length > 300;
     return Object(snabbdom__WEBPACK_IMPORTED_MODULE_0__["h"])(`li.note-type--${note.type}`, {
       class: {
@@ -961,7 +962,14 @@ async function buildSidePanelNotes(notes) {
         click: captureClickEvents
       }
     }, [Object(snabbdom__WEBPACK_IMPORTED_MODULE_0__["h"])('div.note-content', {}, [Object(snabbdom__WEBPACK_IMPORTED_MODULE_0__["h"])('p', {}, trimText ? [Object(snabbdom__WEBPACK_IMPORTED_MODULE_0__["h"])('span.visible-text', note.text.slice(0, 300)), Object(snabbdom__WEBPACK_IMPORTED_MODULE_0__["h"])('span.hidden-text-fragment', note.text.slice(300))] : Object(snabbdom__WEBPACK_IMPORTED_MODULE_0__["h"])('span', note.text)), Object(snabbdom__WEBPACK_IMPORTED_MODULE_0__["h"])('div.note-tags', {}, note.tags.map(tag => {
-      return Object(snabbdom__WEBPACK_IMPORTED_MODULE_0__["h"])('span', `#${tag}`);
+      return Object(snabbdom__WEBPACK_IMPORTED_MODULE_0__["h"])('span', {
+        on: {
+          click: [filterNotesWithTag, tag]
+        },
+        class: {
+          'selected': tag === filteringTag
+        }
+      }, `#${tag}`);
     }))]), Object(snabbdom__WEBPACK_IMPORTED_MODULE_0__["h"])('div.note-tools', {}, [Object(snabbdom__WEBPACK_IMPORTED_MODULE_0__["h"])('a.note-tools--edit', {
       on: {
         click: [editNote, index]
@@ -1016,6 +1024,11 @@ async function buildSidePanelNotes(notes) {
       }
     })])])])]);
   });
+}
+
+function filterNotesWithTag(tag) {
+  filteringTag = filteringTag === tag ? '' : tag;
+  refreshContent();
 }
 
 function editNote(noteIndex, event) {
