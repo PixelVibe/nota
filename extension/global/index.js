@@ -118,7 +118,6 @@ class Storage {
     data
   } = note) {
     const dbObject = await this.retrieveNotesForUrl(id);
-    console.log('edit', data);
     let doc = {};
 
     if (!dbObject) {
@@ -168,13 +167,13 @@ class Storage {
 __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _Storage__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./Storage */ "./src/global/Storage.js");
 
-const notaExtensionDb = new _Storage__WEBPACK_IMPORTED_MODULE_0__["default"]();
+const bjExtensionDb = new _Storage__WEBPACK_IMPORTED_MODULE_0__["default"]();
 browser.runtime.onMessage.addListener(message => {
   switch (message.type) {
     case 'fetch-notes-for-active-tab-url':
       {
         try {
-          return notaExtensionDb.retrieveNotesForUrl(message.docId, message.noteIndex);
+          return bjExtensionDb.retrieveNotesForUrl(message.docId, message.noteIndex);
         } catch (error) {
           console.log('Error while fetching notes ', error);
         }
@@ -260,11 +259,11 @@ browser.contextMenus.create({
 }); // Functions to handle events
 
 function createNewNote(note) {
-  notaExtensionDb.createNote(note);
+  bjExtensionDb.createNote(note);
 }
 
 function deleteNote(note) {
-  notaExtensionDb.deleteNote(note);
+  bjExtensionDb.deleteNote(note);
 }
 
 /***/ })

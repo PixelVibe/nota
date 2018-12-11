@@ -17,7 +17,6 @@ export default class Storage {
   // Put single
   async createNote({ id, data } = note) {
     const dbObject = await this.retrieveNotesForUrl(id);
-    console.log('edit', data);
     let doc = {};
     if (!dbObject) {
       doc[id] = data;

@@ -1,6 +1,6 @@
 import Storage from './Storage';
 
-const notaExtensionDb = new Storage();
+const bjExtensionDb = new Storage();
 
 browser
   .runtime
@@ -9,7 +9,7 @@ browser
     switch (message.type) {
       case 'fetch-notes-for-active-tab-url': {
         try {
-          return notaExtensionDb.retrieveNotesForUrl(message.docId, message.noteIndex);
+          return bjExtensionDb.retrieveNotesForUrl(message.docId, message.noteIndex);
         } catch (error) {
           console.log('Error while fetching notes ', error);
         }
@@ -92,9 +92,9 @@ browser.contextMenus.create({
 
 // Functions to handle events
 function createNewNote(note) {
-  notaExtensionDb.createNote(note);
+  bjExtensionDb.createNote(note);
 }
 
 function deleteNote(note) {
-  notaExtensionDb.deleteNote(note);
+  bjExtensionDb.deleteNote(note);
 }

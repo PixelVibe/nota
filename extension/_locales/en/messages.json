@@ -1,26 +1,26 @@
 {
   "extensionName": {
-    "message": "Nota",
-    "description": "Easily keep notes"
+    "message": "Brainjots",
+    "description": "An easy way to keep notes and annotate text found on the web!"
   },
 
   "extensionDescription": {
-    "message": "Demonstrates the menus API.",
-    "description": "Description of the add-on."
+    "message": "Brainjots of text",
+    "description": "Description of Brainjots."
   },
 
   "contextMenuItemHighlightInteresting": {
     "message": "Interesting",
-    "description": "Description of the add-on."
+    "description": "Mark the selected or the newly created text as an interesting note to keep."
   },
 
   "contextMenuItemHighlightReview": {
     "message": "Review",
-    "description": "Description of the add-on."
+    "description": "Mark the selected or the newly created text as something that needs a second look."
   },
 
   "contextMenuItemHighlightOther": {
     "message": "Note",
-    "description": "Description of the add-on."
+    "description": "Mark the selected or the newly created text as a simple note."
   }
 }
