@@ -1,97 +1,50 @@
-import PouchDb from 'pouchdb'
-
-// _id: string,
-// notes: [{
-//   text: string,
-//   type: string,
-//   tags: string[],
-// }]
-
 export default class Storage {
-
-  config = {
-    include_docs: true,
-  }
-
-  constructor(dbName /* string */) {
-    this.db = new PouchDb(dbName);
-  }
-
   // Retrieve single
-  retrieveNotesForUrl(id, index = false) {
-    if (index !== false) {
-      return this.db.get(id).then((results) => results.notes[index]);
-    } else {
-      return this.db.get(id);
+  async retrieveNotesForUrl(id, index = false) {
+    try {
+      const res = await browser.storage.local.get(id);
+
+      if (index) {
+        return res[id].notes[index];
+      } else {
+        return res[id];
+      }
+    } catch (error) {
+      console.log("something went wrong", error.message);
     }
   }
 
   // Put single
-  async createNote(document) {
-    try {
-      const existingDoc = await this.retrieveNotesForUrl(document._id);
-      if (document.editingInfo.isEditing) {
-        existingDoc.notes.splice(document.editingInfo.index, 1, document.notes[0]);
+  async createNote({ id, data } = note) {
+    const dbObject = await this.retrieveNotesForUrl(id);
+    let doc = {};
+    if (!dbObject) {
+      doc[id] = data;
+    } else {
+      doc[id] = dbObject;
+      // Check if the document is in edit mode
+      if (data.editingInfo.isEditing) {
+        console.log('edit', data);
+        doc[id].notes.splice(data.editingInfo.index, 1, data.notes[0]);
       } else {
-        existingDoc.notes.push(document.notes[0]);
+        doc[id].notes = [data.notes[0], ...dbObject.notes];
       }
-      try {
-        const result = await this.db.put(existingDoc);
-
-        // Notify areas that need to be updated like the side panel and the extension page
-        browser.runtime.sendMessage({
-          type: 'refresh-content',
-          body: {
-            id: result.id,
-          }
-        });
-
-      } catch (error) {
-        console.log('error while trying to update a document', error);
-      }
-    } catch (error) {
-      // If it is missing create a new one
-      if (error.status === 404) {
-        try {
-          const result = await this.db.put(document);
-
-          // Notify areas that need to be updated like the side panel and the extension page
-          browser.runtime.sendMessage({
-            type: 'refresh-content',
-            body: {
-              id: result.id,
-            }
-          });
-
-          // Let the initiator know that the document has been saved into the db
-          return Promise.resolve(result.id);
-
-        } catch (error) {
-          return Promise.reject(error);
-        }
-      }
-      return Promise.reject(error);
     }
+
+    // Store the new/updated document
+    browser.storage.local.set(doc);
   }
 
   // Delete notes
-  async deleteNote(noteInfo) {
+  async deleteNote({id, index} = noteInfo) {
     try {
-      const document = await this.retrieveNotesForUrl(noteInfo._id);
-      document.notes.splice(noteInfo.index, 1);
-      const result = await this.db.put(document);
-      // Notify areas that need to be updated like the side panel and the extension page
-      browser.runtime.sendMessage({
-        type: 'refresh-content',
-        body: {
-          id: result.id,
-        }
-      });
+      const dbObject = await this.retrieveNotesForUrl(id);
+      let doc = {};
+      doc[id] = dbObject;
+      doc[id].notes.splice(index, 1);
+      browser.storage.local.set(doc);
     } catch (error) {
-      console.log('there was an error while trying to delete the note', error);
+      console.log("there was an error while trying to delete the note", error);
     }
   }
-
-  // Sync with remote?
-  syncDb() { }
 }

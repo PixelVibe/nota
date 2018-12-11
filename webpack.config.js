@@ -10,7 +10,9 @@ module.exports = {
     'sidebar/panel': './src/sidebar/panel.js',
     'contextMenu/ContextMenu': './src/contextMenu/ContextMenu.js',
     'popup/popup': './src/popup/popup.js',
+    'options/options': './src/options/options.js',
     'global/index': './src/global/index.js',
+    'contentScripts/index': './src/contentScripts/index.js',
   },
   output: {
     // This copies each source entry into the extension dist folder named

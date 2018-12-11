@@ -1,23 +1,7 @@
-// browser.contextMenus.create({
-//   id: "highlight-item",
-//   title: browser.i18n.getMessage("contextMenuItemHighlightSelection"),
-//   contexts: ["selection"],
-//   type: "normal",
+// browser.contextMenus.onClicked.addListener((info, tab) => {
+//   console.log(info);
+//   browser.runtime.sendMessage('la');
 // });
-browser.contextMenus.onClicked.addListener((info, tab) => {
-  console.log(info);
-  browser.runtime.sendMessage('la');
-});
-
-// function doSomething() {
-//   // browser.browserAction.openPopup().then(() => {
-//   //   console.log('is open');
-//   //   browser.runtime.sendMessage({
-//   //     type: "new-highlighted-note",
-//   //     message: 'info.srcUrl',
-//   //   });
-//   // })
-// }
 
 browser.contextMenus.create({
   id: "highlight-interesting",

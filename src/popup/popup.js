@@ -88,18 +88,20 @@ function getActiveTab() {
 
 async function submitForm(formDataJson) {
   const currentTab = await getActiveTab();
-  const _id = currentTab[0].url;
+  const id = currentTab[0].url;
   try {
     await browser.runtime.sendMessage({
       type: 'new-note',
       body: {
-        editingInfo,
-        _id,
-        notes: [{
-          text: formDataJson['note-content'],
-          type: formDataJson['note-type'],
-          tags: Array.from(tags),
-        }]
+        id,
+        data: {
+          editingInfo,
+          notes: [{
+            text: formDataJson['note-content'],
+            type: formDataJson['note-type'],
+            tags: Array.from(tags),
+          }]
+        }
       }
     });
     window.close();

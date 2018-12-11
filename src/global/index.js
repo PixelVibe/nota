@@ -1,6 +1,6 @@
 import Storage from './Storage';
 
-const notaExtensionDb = new Storage('notaExtensionDb');
+const notaExtensionDb = new Storage();
 
 browser
   .runtime
@@ -17,6 +17,7 @@ browser
         break;
       }
 
+      // New notes coming from the popup action and not from selected text
       case 'new-note': {
         createNewNote(message.body);
         break;
@@ -26,15 +27,13 @@ browser
         deleteNote(message.body);
         break;
       }
-
     }
   });
 
 // Context menu
-browser.contextMenus.onClicked.addListener((contextMenuItem, tab) => {
-
+browser.contextMenus.onClicked.addListener((OnClickData) => {
   let type;
-  switch(contextMenuItem.menuItemId) {
+  switch(OnClickData.menuItemId) {
     case 'highlight-interesting': {
       type = 'interesting';
       break;
@@ -48,19 +47,26 @@ browser.contextMenus.onClicked.addListener((contextMenuItem, tab) => {
       break;
     }
   }
+  createNewNote({
+    id: OnClickData.pageUrl,
+    data: {
+      editingInfo: {
+        isEditing: false
+      },
+      notes: [{
+        text: OnClickData.selectionText,
+        type, tags: []
+      }],
+      meta: []
+    }
+  });
 
-  const note = {
-    _id: contextMenuItem.pageUrl,
-    editingInfo: {
-      isEditing: false
-    },
-    notes: [{
-      text: contextMenuItem.selectionText,
-      type, tags: []
-    }]
-  }
-
-  createNewNote(note);
+  // browser.tabs.executeScript({
+  //   file: "./../contentScripts/index.js",
+  // })
+  // .catch((error) => {
+  //   console.log('There was an error while injecting the content script', error);
+  // })
 
 });
 

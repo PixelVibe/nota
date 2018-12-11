@@ -19,8 +19,9 @@ patch(container, vNode);
 // Initially it was with tabs.onUpdated, but it was triggering multiple times
 browser.webNavigation.onCompleted.addListener(refreshContent);
 browser.tabs.onActivated.addListener(refreshContent);
+browser.storage.onChanged.addListener(refreshContent);
 
-// This is to handle the cases of opening the sidepanel or when creating a new window
+// Handle the cases of opening the sidepanel or when creating a new window
 browser.windows.getCurrent().then((windowInfo) => {
   activeWindowId = windowInfo.id;
   refreshContent();
@@ -61,38 +62,24 @@ async function refreshContent() {
   const url = await retrieveActiveTabURL();
 
   try {
-    const response = await browser.runtime.sendMessage({
-      type: 'fetch-notes-for-active-tab-url',
-      docId: url,
-    });
+    const doc = await browser.storage.local.get(url);
 
-    // If the notes array is empty, throw an error with the string missing, to match
-    // the default error message from pouchDb when a document doesn't exist
-    if (response.notes.length === 0) {
-      throw Error('missing');
+    if (!doc[url]) {
+      patch(vNode, h('ul', {}, [
+        h('li', {}, 'There are no notes for this page!')
+      ]));
+    } else {
+      buildSidePanelNotes(doc[url].notes).then((notesList) => {
+        // Reset the parent node
+        patch(vNode, h('ul', {}, notesList));
+      });
     }
 
-    buildSidePanelNotes(response.notes).then((notesList) => {
-      // Reset the parent node
-      patch(vNode, h('ul', {}, notesList));
-    });
 
   } catch (error) {
-    switch (error.message) {
-      // Missing is a default message from pouchDb when the key doesn't exist
-      case 'missing': {
-        patch(vNode, h('ul', {}, [
-          h('li', {}, 'There are no notes for this page!')
-        ]));
-        break;
-      }
-
-      default: {
-        patch(vNode, h('ul', {}, [
-          h('li', {}, error.message)
-        ]));
-      }
-    }
+    patch(vNode, h('ul', {}, [
+      h('li', {}, error.message)
+    ]));
   }
 }
 
@@ -105,7 +92,7 @@ async function buildSidePanelNotes(notes) {
       h(`li.note-type--${note.type}`, {class: {'trimmed-text' : trimText}, on: {click: captureClickEvents}}, [
         h('div.note-content', {}, [
           h('p', {}, 
-            trimText ? [h('span.visible-text', {}, `${note.text.slice(0, 300)}...`), h('span.hidden-text-fragment', {}, note.text.slice(300))] : h('span', {}, note.text)
+            trimText ? [h('span.visible-text', note.text.slice(0, 300)), h('span.hidden-text-fragment', note.text.slice(300))] : h('span', note.text)
           ),
           h('div.note-tags', {}, note.tags.map((tag) => {
             return h('span', `#${tag}`)
@@ -136,41 +123,32 @@ async function buildSidePanelNotes(notes) {
   });
 }
 
-function editNote(noteIndex) {
+function editNote(noteIndex, event) {
+  event.cancelBubble = true;
   editingNote = noteIndex;
   browser.browserAction.openPopup();
 }
 
-async function deleteNote(noteIndex) {
+async function deleteNote(noteIndex, event) {
+  event.cancelBubble = true;
   const url = await retrieveActiveTabURL();
   if (window.confirm(`Are you sure you want to delete this note?`)) {
     browser.runtime.sendMessage({
       type: 'delete-note',
       body: {
-        _id: url,
+        id: url,
         index: noteIndex,
       }
     });
   }
 }
 
-function toggleFoldText(_itemIndex, event, node) {
-  // event.cancelBubble = true;
+function toggleFoldText(_noteIndex, event, node) {
   if(event.target.tagName !== 'A') {
     event.cancelBubble = true;
     node.elm.dispatchEvent(new Event('click', {bubbles: true}));
     return;
   }
-  // console.log(event.bubbles);
-  // console.log(node.elm);
-  // console.log(node);
-  // if (event.target.tagName)
-  // event.cancelBubble = true
-  // // console.log(event);
-  
-  // console.log(itemIndex)
-  // console.log(event)
-  // console.log(b)
 }
 
 
@@ -181,7 +159,16 @@ function captureClickEvents(event, node) {
       break;
     }
     default: {
-      return;
+      // browser.find.find(node.elm.textContent.slice(0, 100), {
+      //   includeRangeData: true,
+      // })
+      // .then((results) => {
+      //   browser.find.highlightResults();
+      //   console.log(results);
+      // })
+      // .catch((error) => {
+      //   console.log(error);
+      // })
     }
   }
 }
