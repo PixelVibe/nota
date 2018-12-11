@@ -1,10 +1,10 @@
 export default class Storage {
   // Retrieve single
-  async retrieveNotesForUrl(id, index = false) {
+  async retrieveNotesForUrl(id, index = -1) {
     try {
       const res = await browser.storage.local.get(id);
 
-      if (index) {
+      if (index > -1) {
         return res[id].notes[index];
       } else {
         return res[id];
@@ -17,6 +17,7 @@ export default class Storage {
   // Put single
   async createNote({ id, data } = note) {
     const dbObject = await this.retrieveNotesForUrl(id);
+    console.log('edit', data);
     let doc = {};
     if (!dbObject) {
       doc[id] = data;
@@ -24,7 +25,6 @@ export default class Storage {
       doc[id] = dbObject;
       // Check if the document is in edit mode
       if (data.editingInfo.isEditing) {
-        console.log('edit', data);
         doc[id].notes.splice(data.editingInfo.index, 1, data.notes[0]);
       } else {
         doc[id].notes = [data.notes[0], ...dbObject.notes];

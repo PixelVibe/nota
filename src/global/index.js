@@ -9,8 +9,7 @@ browser
     switch (message.type) {
       case 'fetch-notes-for-active-tab-url': {
         try {
-          let noteIndexToRetrieve = message.noteIndex > -1 ? message.noteIndex : false;
-          return notaExtensionDb.retrieveNotesForUrl(message.docId, noteIndexToRetrieve);
+          return notaExtensionDb.retrieveNotesForUrl(message.docId, message.noteIndex);
         } catch (error) {
           console.log('Error while fetching notes ', error);
         }

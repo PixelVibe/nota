@@ -98,11 +98,11 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return Storage; });
 class Storage {
   // Retrieve single
-  async retrieveNotesForUrl(id, index = false) {
+  async retrieveNotesForUrl(id, index = -1) {
     try {
       const res = await browser.storage.local.get(id);
 
-      if (index) {
+      if (index > -1) {
         return res[id].notes[index];
       } else {
         return res[id];
@@ -118,6 +118,7 @@ class Storage {
     data
   } = note) {
     const dbObject = await this.retrieveNotesForUrl(id);
+    console.log('edit', data);
     let doc = {};
 
     if (!dbObject) {
@@ -126,7 +127,6 @@ class Storage {
       doc[id] = dbObject; // Check if the document is in edit mode
 
       if (data.editingInfo.isEditing) {
-        console.log('edit', data);
         doc[id].notes.splice(data.editingInfo.index, 1, data.notes[0]);
       } else {
         doc[id].notes = [data.notes[0], ...dbObject.notes];
@@ -174,8 +174,7 @@ browser.runtime.onMessage.addListener(message => {
     case 'fetch-notes-for-active-tab-url':
       {
         try {
-          let noteIndexToRetrieve = message.noteIndex > -1 ? message.noteIndex : false;
-          return notaExtensionDb.retrieveNotesForUrl(message.docId, noteIndexToRetrieve);
+          return notaExtensionDb.retrieveNotesForUrl(message.docId, message.noteIndex);
         } catch (error) {
           console.log('Error while fetching notes ', error);
         }
