@@ -119,7 +119,6 @@ class Storage {
   } = note) {
     const dbObject = await this.retrieveNotesForUrl(id);
     let doc = {};
-    console.log(dbObject); // If the
 
     if (!dbObject) {
       doc[id] = data;
@@ -148,23 +147,11 @@ class Storage {
       let doc = {};
       doc[id] = dbObject;
       doc[id].notes.splice(index, 1);
-      browser.storage.local.set(doc); // const document = await this.retrieveNotesForUrl(noteInfo._id);
-      // document.notes.splice(noteInfo.index, 1);
-      // const result = await this.db.put(document);
-      // // Notify areas that need to be updated like the side panel and the extension page
-      // browser.runtime.sendMessage({
-      //   type: "refresh-content",
-      //   body: {
-      //     id: result.id
-      //   }
-      // });
+      browser.storage.local.set(doc);
     } catch (error) {
       console.log("there was an error while trying to delete the note", error);
     }
-  } // Sync with remote?
-
-
-  syncDb() {}
+  }
 
 }
 
@@ -181,10 +168,8 @@ class Storage {
 __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _Storage__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./Storage */ "./src/global/Storage.js");
 
-const notaExtensionDb = new _Storage__WEBPACK_IMPORTED_MODULE_0__["default"]('notaExtensionDb'); // let note = {};
-
+const notaExtensionDb = new _Storage__WEBPACK_IMPORTED_MODULE_0__["default"]();
 browser.runtime.onMessage.addListener(message => {
-  // console.log('kkk', message);
   switch (message.type) {
     case 'fetch-notes-for-active-tab-url':
       {
@@ -210,12 +195,6 @@ browser.runtime.onMessage.addListener(message => {
         deleteNote(message.body);
         break;
       }
-
-    case 'selected-text':
-      {
-        console.log(message.body);
-        break; // createNewNote(note);
-      }
   }
 }); // Context menu
 
@@ -240,21 +219,7 @@ browser.contextMenus.onClicked.addListener(OnClickData => {
         type = 'other';
         break;
       }
-  } // note = {
-  //   id: OnClickData.pageUrl,
-  //   data: {
-  //     editingInfo: {
-  //       isEditing: false
-  //     },
-  //     notes: [{
-  //       text: OnClickData.selectionText,
-  //       type, tags: []
-  //     }],
-  //     meta: []
-  //   }
-  // }
-  // console.log(note);
-
+  }
 
   createNewNote({
     id: OnClickData.pageUrl,
@@ -296,7 +261,6 @@ browser.contextMenus.create({
 }); // Functions to handle events
 
 function createNewNote(note) {
-  console.log(note);
   notaExtensionDb.createNote(note);
 }
 

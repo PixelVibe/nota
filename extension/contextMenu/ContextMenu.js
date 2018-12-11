@@ -93,10 +93,10 @@
 /*! no static exports found */
 /***/ (function(module, exports) {
 
-browser.contextMenus.onClicked.addListener((info, tab) => {
-  console.log(info);
-  browser.runtime.sendMessage('la');
-});
+// browser.contextMenus.onClicked.addListener((info, tab) => {
+//   console.log(info);
+//   browser.runtime.sendMessage('la');
+// });
 browser.contextMenus.create({
   id: "highlight-interesting",
   type: "normal",
