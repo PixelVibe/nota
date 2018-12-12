@@ -98,7 +98,9 @@ const CLIENT_ID = "e2f3f3z4u7dumch";
 const AUTH_URL = `https://www.dropbox.com/oauth2/authorize\
 ?client_id=${CLIENT_ID}\
 &response_type=token\
-&redirect_uri=${encodeURIComponent(REDIRECT_URL)}`;
+&redirect_uri=${encodeURIComponent(REDIRECT_URL)}`; // const dropboxConnectLink = document.getElementById('connect');
+
+const openExtensionPageLink = document.getElementById('open-ext');
 
 function extractAccessToken(redirectUri) {
   let m = redirectUri.match(/[#?](.*)/);
@@ -139,7 +141,6 @@ function getAccessToken() {
   });
 }
 
-const b = document.getElementById('connect');
 browser.storage.sync.get('token', res => {
   if (res.token) {
     b.innerText = 'You are authorized';
@@ -147,10 +148,17 @@ browser.storage.sync.get('token', res => {
   }
 
   ;
-});
-b.addEventListener('click', e => {
-  e.preventDefault();
-  getAccessToken();
+}); // dropboxConnectLink.addEventListener('click', (e) => {
+//   e.preventDefault();
+//   getAccessToken();
+// });
+
+openExtensionPageLink.addEventListener('click', eve => {
+  eve.preventDefault();
+  browser.runtime.sendMessage({
+    type: 'open-extension-page',
+    body: {}
+  });
 });
 
 /***/ })

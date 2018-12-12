@@ -130,9 +130,12 @@ svg.less {
   margin-bottom: 50px;
 }
 
+h2 {
+  margin: 0;
+}
+
 h2 a {
   color: #FFF;
-  margin: 0;
   text-align: center;
   text-decoration: none;
   display: block;
@@ -140,27 +143,3 @@ h2 a {
   padding: 1rem 0;
   cursor: pointer;
 }
-
-/* fec60d
-
-3d9730 */
-
-/* p {
-  margin: 1em 2em;
-}
-
-#content {
-  height: 90%;
-  margin: 2em 2em 0 2em;
-  border: .5em solid #DDE4E9;
-  transition: background-color .2s ease-out;
-}
-
-#content[contenteditable=true] {
-  background-color: white;
-  transition: background-color .2s ease-in;
-}
-
-[contenteditable]:focus {
-  outline: 0px solid transparent;
-} */

@@ -260,15 +260,6 @@ function updateFormWithNoteInformation(note) {
   });
 }
 
-const a = document.getElementById('open-ext');
-a.addEventListener('click', eve => {
-  eve.preventDefault();
-  browser.runtime.sendMessage({
-    type: 'open-extension-page',
-    body: {}
-  });
-});
-
 /***/ })
 
 /******/ });
