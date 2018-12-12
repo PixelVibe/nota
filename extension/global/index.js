@@ -146,7 +146,12 @@ class Storage {
       let doc = {};
       doc[id] = dbObject;
       doc[id].notes.splice(index, 1);
-      browser.storage.local.set(doc);
+
+      if (doc[id].notes.length === 0) {
+        browser.storage.local.remove(id);
+      } else {
+        browser.storage.local.set(doc);
+      }
     } catch (error) {
       console.log("there was an error while trying to delete the note", error);
     }
