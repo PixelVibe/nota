@@ -130,13 +130,15 @@ svg.less {
   margin-bottom: 50px;
 }
 
-h2 {
-  display: block;
-  background-color: #222;
+h2 a {
   color: #FFF;
   margin: 0;
-  line-height: 3rem;
-  text-indent: 20px;
+  text-align: center;
+  text-decoration: none;
+  display: block;
+  background-color: #222;
+  padding: 1rem 0;
+  cursor: pointer;
 }
 
 /* fec60d

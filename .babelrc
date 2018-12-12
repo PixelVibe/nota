@@ -1,12 +1,8 @@
 {
   "presets": [
-    ["@babel/preset-env", {
-        "targets": {
-            "firefox": 57
-        }
-    }]
+    ["@babel/preset-env", {"targets": {"firefox": 57}}]
   ],
   "plugins": [
-    "@babel/plugin-proposal-class-properties"
+    ["@babel/plugin-transform-react-jsx", { "pragma":"h" }]
   ]
 }

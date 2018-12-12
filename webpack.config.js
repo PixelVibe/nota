@@ -32,7 +32,7 @@ module.exports = {
   },
   resolve: {
     // This allows you to import modules just like you would in a NodeJS app.
-    extensions: ['.js'],
+    extensions: ['.js', '.jsx'],
     modules: [
       'src',
       'node_modules',

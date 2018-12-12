@@ -1,36 +1,83 @@
-const app = document.getElementById('app');
+import { h, render, Component } from "preact";
+const app = document.getElementById("app");
 
-browser
-  .storage
-  .local
-  .get()
-  .then((res) => {
-    const notes = document.createElement('div');
-    for (const key in res) {
-      if (res.hasOwnProperty(key)) {
-        const notesHeader = document.createElement('div');
-        notesHeader.innerHTML = `<h2>${key}</h2>`;
-        const notesList = document.createElement('ul');
-        notesList.classList.add('notesList');
-        notesList.innerHTML = res[key].notes.map((note) => {
-          return `<li class="note-type--${note.type}">
-            <div class="note-content">
-              <p><span>${note.text}</span></p>
-              <div class="note-tags">
-                ${note.tags.map((tag) => {
-                  return `<span>#${tag}</span>`
-                })}
-              </div>
-            </div>
-          </li>`;
-        })
-        .join('');
-        notes.appendChild(notesHeader);
-        notes.appendChild(notesList);
+class NotesListFull extends Component {
+  constructor() {
+    super();
+    this.state.notes;
+    this.updateState = this.updateState.bind(this);
+  }
+
+  componentDidMount() {
+    this.updateState();
+    browser.storage.onChanged.addListener(this.updateState);
+  }
+
+  updateState() {
+    browser.storage.local.get().then(notes => {
+      this.setState({ notes });
+    });
+  }
+
+  renderNoteGroups(state) {
+    let a = [];
+    for (const key in state.notes) {
+      if (state.notes.hasOwnProperty(key)) {
+        a.push(
+          <h2>
+            <a onClick={openTab(key)}>{key}</a>
+          </h2>
+        );
+        a.push(
+          <ul>
+            {
+              state
+                .notes[key]
+                .notes
+                .map((note, index) => {
+                  return (
+                    <li className={'note-type--' + note.type}>
+                      <div className="note-content">
+                        <p><span>{note.text}</span></p>
+                      </div>
+                      <div className="note-tools">
+                        <a href="#" className="note-tools--delete" onClick={(e) => deleteNote(index, key, e)}>
+                          <svg className="delete" width='24' height='24' viewBox='0 0 24 24'>
+                            <use xlinkHref="#delete" />
+                          </svg>
+                        </a>
+                      </div>
+                    </li>
+                  )
+                })
+            }
+          </ul>
+        )
       }
     }
-    app.appendChild(notes);
-  })
-  .catch((error) => {
-    console.log(error);
-  })
+    return a;
+  }
+
+  render(_props, state) {
+    return <div>{this.renderNoteGroups(state)}</div>;
+  }
+}
+
+async function deleteNote(noteIndex, url, event) {
+  event.cancelBubble = true;
+  if (window.confirm(`Are you sure you want to delete this note?`)) {
+    browser.runtime.sendMessage({
+      type: 'delete-note',
+      body: {
+        id: url,
+        index: noteIndex,
+      }
+    });
+  }
+}
+
+function openTab(ref) {
+  // console.log(ref);
+}
+
+render(<NotesListFull />, app);
