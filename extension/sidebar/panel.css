@@ -11,14 +11,13 @@ body {
 }
 
 ul {
-  padding-inline-start: 0;
+  padding: 0;
+  margin: 0;
 }
 
 ul li {
   margin-block-start: 1em;
   list-style-type: none;
-  border-left: 8px solid;
-  padding-left: 8px;
   display: flex;
   flex-direction: row;
 }
@@ -27,16 +26,28 @@ ul li p {
   margin-top: 0;
 }
 
-.note-type--other {
-  border-left-color: #0e68b7;
+.note-type--other .note-tools {
+  background-color: #0e68b7;
 }
 
-.note-type--review {
-  border-left-color: #902f72;
+.note-type--review .note-tools {
+  background-color: #902f72;
 }
 
-.note-type--interesting {
-  border-left-color: #fb6c0e;
+.note-type--interesting .note-tools {
+  background-color: #fb6c0e;
+}
+
+ul .note-type--other:hover .note-content {
+  background-color: #e8f4fd;
+}
+
+ul .note-type--review:hover .note-content {
+  background-color: #f8e8f3;
+}
+
+ul .note-type--interesting:hover .note-content {
+  background-color: #fff0e7;
 }
 
 .note-tags span {
@@ -47,23 +58,30 @@ ul li p {
 }
 
 .note-content {
-  padding-right: 8px;
   flex: 1;
 }
 
+.note-content:hover {
+  cursor: pointer;
+}
+
+.note-content p {
+  padding: 0 8px;
+  margin: 0;
+}
+
 .note-tools {
-  background: rgb(241, 241, 241);
   padding: 2px;
 }
 
 .note-tools svg {
-  fill: #999;
+  fill: #FFF;
   transition: fill .2s ease-in;
 }
 
 .note-tools a {
   cursor: pointer;
-  border-bottom: 1px dotted #999;
+  border-bottom: 1px dotted #FFF;
   width: 20px;
   padding: 4px 0;
   display: block;
@@ -114,34 +132,25 @@ svg.more {
 }
 
 .folded {
-  height: 160px;
+  max-height: calc(16px * 10);
   overflow: hidden;
 }
 
 .folded.open {
-  height: auto;
+  max-height: 100%;
 }
 
-/* fec60d
-
-3d9730 */
-
-/* p {
-  margin: 1em 2em;
+.info {
+  background-color: #DDD;
+  padding: 8px 2px;
+  box-shadow: 0px 0px 8px #999;
 }
 
-#content {
-  height: 90%;
-  margin: 2em 2em 0 2em;
-  border: .5em solid #DDE4E9;
-  transition: background-color .2s ease-out;
+body {
+  overflow: hidden;
 }
 
-#content[contenteditable=true] {
-  background-color: white;
-  transition: background-color .2s ease-in;
+ul.notes {
+  height: 100vh;
+  overflow: auto;
 }
-
-[contenteditable]:focus {
-  outline: 0px solid transparent;
-} */

@@ -65,7 +65,7 @@ class NotesListFull extends Component {
 
 async function deleteNote(noteIndex, url, event) {
   event.cancelBubble = true;
-  if (window.confirm(`Are you sure you want to delete this note?`)) {
+  if (window.confirm(browser.i18n.getMessage("panelDeleteNoteConfirmation"))) {
     browser.runtime.sendMessage({
       type: 'delete-note',
       body: {

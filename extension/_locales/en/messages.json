@@ -22,5 +22,25 @@
   "contextMenuItemHighlightOther": {
     "message": "Note",
     "description": "Mark the selected or the newly created text as a simple note."
+  },
+
+  "panelDeleteNoteConfirmation": {
+    "message": "Are you sure you want to delete this note?",
+    "description": "Mark the selected or the newly created text as a simple note."
+  },
+
+  "panelViewFilteredNotesOfType": {
+    "message": "Displaying notes marked as",
+    "description": "Mark the selected or the newly created text as a simple note."
+  },
+
+  "panelViewAllNotesInfo": {
+    "message": "Displaying all notes",
+    "description": "Mark the selected or the newly created text as a simple note."
+  },
+
+  "panelNoNotes": {
+    "message": "There are no notes!",
+    "description": "Mark the selected or the newly created text as a simple note."
   }
 }

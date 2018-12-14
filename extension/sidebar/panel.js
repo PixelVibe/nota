@@ -841,8 +841,6 @@ var preact = {
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var preact__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! preact */ "./node_modules/preact/dist/preact.mjs");
-// import * as snabbdom from 'snabbdom';
-// import { h } from 'snabbdom';
 
 const container = document.getElementById('notesContainer');
 
@@ -850,7 +848,8 @@ class SidePanelNotes extends preact__WEBPACK_IMPORTED_MODULE_0__["Component"] {
   constructor() {
     super();
     this.state.notes = [];
-    this.state.filteringTag = '';
+    this.state.filterByTag = '';
+    this.state.filterByType = '';
     this.updateState = this.updateState.bind(this);
   }
 
@@ -862,25 +861,18 @@ class SidePanelNotes extends preact__WEBPACK_IMPORTED_MODULE_0__["Component"] {
   }
 
   updateState() {
-    browser.windows.getCurrent().then(windowInfo => {
-      browser.tabs.query({
-        windowId: windowInfo.id,
-        active: true
-      }).then(tabs => {
-        browser.storage.local.get(tabs[0].url).then(results => {
-          // Check if we have anything for the active url
-          if (!results[tabs[0].url]) {
-            this.setState({
-              notes: []
-            });
-          } else {
-            this.setState({
-              notes: results[tabs[0].url].notes
-            });
-          }
-        }).catch(error => {
-          throw error;
-        });
+    retrieveActiveTabURL().then(tabUrl => {
+      browser.storage.local.get(tabUrl).then(results => {
+        // Check if we have anything for the active url
+        if (!results[tabUrl]) {
+          this.setState({
+            notes: []
+          });
+        } else {
+          this.setState({
+            notes: results[tabUrl].notes
+          });
+        }
       }).catch(error => {
         throw error;
       });
@@ -896,7 +888,9 @@ class SidePanelNotes extends preact__WEBPACK_IMPORTED_MODULE_0__["Component"] {
     }, Object(preact__WEBPACK_IMPORTED_MODULE_0__["h"])("a", {
       href: "#",
       className: "note-tools--edit",
-      onClick: e => editNote(index, e)
+      onClick: () => {
+        editNote(index, e);
+      }
     }, Object(preact__WEBPACK_IMPORTED_MODULE_0__["h"])("svg", {
       className: "edit",
       width: "24",
@@ -909,7 +903,7 @@ class SidePanelNotes extends preact__WEBPACK_IMPORTED_MODULE_0__["Component"] {
       className: "note-tools--fold",
       onClick: e => {
         e.preventDefault();
-        this.base.childNodes[index].classList.toggle('open');
+        this.base.childNodes[1].childNodes[index].classList.toggle('open');
       }
     }, Object(preact__WEBPACK_IMPORTED_MODULE_0__["h"])("svg", {
       className: "more",
@@ -937,25 +931,47 @@ class SidePanelNotes extends preact__WEBPACK_IMPORTED_MODULE_0__["Component"] {
     }, Object(preact__WEBPACK_IMPORTED_MODULE_0__["h"])("use", {
       xlinkHref: "#delete"
     }))));
-  }
+  } // .filter((note) => !(state.filterByTag !== '' && !~note.tags.indexOf(state.filterByTag)))
+
 
   renderNoteItems(state) {
-    return state.notes.filter(note => !(state.filteringTag !== '' && !~note.tags.indexOf(state.filteringTag))).map((note, index) => {
-      const trimText = note.text.length > 300;
+    const notes = state.notes.filter(note => state.filterByType === '' || state.filterByType == note.type).map((note, index) => {
+      const trimText = note.text.length > 400;
       return Object(preact__WEBPACK_IMPORTED_MODULE_0__["h"])("li", {
-        className: ['note-type--' + note.type, trimText ? 'folded' : ''].join(' ')
+        className: [trimText ? 'folded' : '', 'note-type--' + note.type].join(' ')
       }, this.renderNoteTools(index), Object(preact__WEBPACK_IMPORTED_MODULE_0__["h"])("div", {
         className: "note-content"
-      }, Object(preact__WEBPACK_IMPORTED_MODULE_0__["h"])("p", null, Object(preact__WEBPACK_IMPORTED_MODULE_0__["h"])("span", null, note.text)), Object(preact__WEBPACK_IMPORTED_MODULE_0__["h"])("div", {
+      }, Object(preact__WEBPACK_IMPORTED_MODULE_0__["h"])("p", null, note.text), Object(preact__WEBPACK_IMPORTED_MODULE_0__["h"])("div", {
         className: "note-tags"
       }, note.tags.map(tag => Object(preact__WEBPACK_IMPORTED_MODULE_0__["h"])("span", null, "#", tag)))));
     });
+
+    if (notes.length === 0) {
+      return Object(preact__WEBPACK_IMPORTED_MODULE_0__["h"])("li", null, Object(preact__WEBPACK_IMPORTED_MODULE_0__["h"])("h3", null, browser.i18n.getMessage("panelNoNotes")));
+    } else {
+      return notes;
+    }
+  }
+
+  renderNoteslistToolbar(state) {
+    if (state.filterByType === '') {
+      return browser.i18n.getMessage("panelViewAllNotesInfo");
+    } else {
+      Object(preact__WEBPACK_IMPORTED_MODULE_0__["h"])("a", {
+        href: "#",
+        onClick: () => this.setState({
+          filterByType: ''
+        })
+      }, browser.i18n.getMessage("panelViewFilteredNotesOfType") + ' ' + state.filterByType);
+    }
   }
 
   render(_props, state) {
-    return Object(preact__WEBPACK_IMPORTED_MODULE_0__["h"])("ul", {
+    return Object(preact__WEBPACK_IMPORTED_MODULE_0__["h"])("div", null, Object(preact__WEBPACK_IMPORTED_MODULE_0__["h"])("div", {
+      className: "info"
+    }, this.renderNoteslistToolbar(state)), Object(preact__WEBPACK_IMPORTED_MODULE_0__["h"])("ul", {
       className: "notes"
-    }, this.renderNoteItems(state));
+    }, this.renderNoteItems(state)));
   }
 
 }
@@ -965,7 +981,7 @@ Object(preact__WEBPACK_IMPORTED_MODULE_0__["render"])(Object(preact__WEBPACK_IMP
 async function deleteNote(index) {
   const url = await retrieveActiveTabURL();
 
-  if (window.confirm(`Are you sure you want to delete this note?`)) {
+  if (window.confirm(browser.i18n.getMessage("panelDeleteNoteConfirmation"))) {
     browser.runtime.sendMessage({
       type: 'delete-note',
       body: {
@@ -986,146 +1002,16 @@ async function retrieveActiveTabURL() {
     windowId,
     active: true
   }).then(tabs => tabs[0].url);
-} // const patch = snabbdom.init([
-//   require('snabbdom/modules/eventlisteners').default,
-//   require('snabbdom/modules/attributes').default,
-//   require('snabbdom/modules/class').default
-// ]);
-// Holds the active window id when it is focused
-// let activeWindowId;
-// let editingNote = -1;
-// let filteringTag = '';
-// const vNode = h('ul', {}, '');
-// patch(container, vNode);
-// // Any changes to the URL will trigger this when the page has been fully loaded
-// // Initially it was with tabs.onUpdated, but it was triggering multiple times
-// browser.webNavigation.onCompleted.addListener(refreshContent);
-// browser.tabs.onActivated.addListener(refreshContent);
-// browser.storage.onChanged.addListener(refreshContent);
-// // Handle the cases of opening the sidepanel or when creating a new window
-// browser.windows.getCurrent().then((windowInfo) => {
-//   activeWindowId = windowInfo.id;
-//   refreshContent();
-// });
-// // Listen for incoming messages from other parts of the extension
-// // and refresh the notes list
-// browser.runtime.onMessage.addListener((msg) => {
-//   switch (msg.type) {
-//     case 'refresh-content': {
-//       refreshContent();
-//       break;
-//     }
-//     case 'popup-is-active': {
-//       if (editingNote > -1) {
-//         const noteIndex = editingNote;
-//         editingNote = -1;
-//         return Promise.resolve({
-//           type: 'editing',
-//           noteIndex
-//         });
-//       }
-//     }
-//   }
-// })
-// // It will return the URL for the active tab in the focused window instance
-// function retrieveActiveTabURL() {
-//   return browser.tabs.query({ windowId: activeWindowId, active: true }).then((tabs) => tabs[0].url);
-// }
-// // Refreshes the panel content with the notes list
-// // It will fallback to a "no notes message" in case the array is empty
-// // or the document (id: url) is missing all together
-// async function refreshContent() {
-//   const url = await retrieveActiveTabURL();
-//   try {
-//     const doc = await browser.storage.local.get(url);
-//     if (!doc[url]) {
-//       patch(vNode, h('ul', {}, [
-//         h('li', {}, 'There are no notes for this page!')
-//       ]));
-//     } else {
-//       buildSidePanelNotes(doc[url].notes).then((notesList) => {
-//         // Reset the parent node
-//         patch(vNode, h('ul', {}, notesList));
-//       });
-//     }
-//   } catch (error) {
-//     patch(vNode, h('ul', {}, [
-//       h('li', {}, error.message)
-//     ]));
-//   }
-// }
-// // Iterates an array of objects and returns a tree of hyperscript nodes
-// // to be added from snabbdom
-// async function buildSidePanelNotes(notes) {
-//   return notes.filter(note => !(filteringTag !== '' && !~note.tags.indexOf(filteringTag))).map((note, index) => {
-//     let trimText = note.text.length > 300;
-//     return (
-//       h(`li.note-type--${note.type}`, {class: {'trimmed-text' : trimText}, on: {click: captureClickEvents}}, [
-//         h('div.note-content', {}, [
-//           h('p', {}, 
-//             trimText ? [h('span.visible-text', note.text.slice(0, 300)), h('span.hidden-text-fragment', note.text.slice(300))] : h('span', note.text)
-//           ),
-//           h('div.note-tags', {}, note.tags.map((tag) => {
-//             return h('span', { on: { click: [filterNotesWithTag, tag] }, class: {'selected' : tag === filteringTag} }, `#${tag}`)
-//           })),
-//         ]),
-//         h('div.note-tools', {}, [
-//           h('a.note-tools--edit', { on: { click: [editNote, index] } }, [
-//             h('svg.edit', { attrs: { width: 24, height: 24, viewBox: '0 0 24 24' } }, [
-//               h('use', { attrs: { 'xlink:href': "#edit" } })
-//             ])
-//           ]),
-//           h('a.note-tools--fold', { on: { click: [toggleFoldText, index] } }, [
-//             h('svg.more', { attrs: { width: 24, height: 24, viewBox: '0 0 24 24' } }, [
-//               h('use', { attrs: { 'xlink:href': "#more" } })
-//             ]),
-//             h('svg.less', { attrs: { width: 24, height: 24, viewBox: '0 0 24 24' } }, [
-//               h('use', { attrs: { 'xlink:href': "#less" } })
-//             ])
-//           ]),
-//           h('a.note-tools--delete', { on: { click: [deleteNote, index] } }, [
-//             h('svg.delete', { attrs: { width: 24, height: 24, viewBox: '0 0 24 24' } }, [
-//               h('use', { attrs: { 'xlink:href': "#delete" } })
-//             ])
-//           ]),
-//         ])
-//       ])
-//     )
-//   });
-// }
-// function filterNotesWithTag(tag) {
-//   filteringTag = filteringTag === tag ? '' : tag;
-//   refreshContent();
-// }
-
+}
 
 function editNote(noteIndex, event) {
   event.cancelBubble = true;
   editingNote = noteIndex;
   browser.browserAction.openPopup();
-} // function deleteNote(index) {
-//   event.cancelBubble = true;
-//   const url = await retrieveActiveTabURL();
-//   if (window.confirm(`Are you sure you want to delete this note?`)) {
-//     browser.runtime.sendMessage({
-//       type: 'delete-note',
-//       body: {
-//         id: url,
-//         index: noteIndex,
-//       }
-//     });
-//   }
-// }
-
+}
 
 function captureClickEvents(event, node) {
   switch (event.target.className) {
-    case 'note-tools--fold':
-      {
-        node.elm.classList.toggle('unfolded');
-        break;
-      }
-
     default:
       {// browser.find.find(node.elm.textContent.slice(0, 100), {
         //   includeRangeData: true,
