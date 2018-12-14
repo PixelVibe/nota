@@ -61,3 +61,6 @@ typings/
 .next
 
 .DS_Store
+extension.zip
+.web-extension-id
+web-ext-artifacts
