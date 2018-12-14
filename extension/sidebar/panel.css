@@ -91,27 +91,35 @@ ul li p {
   color: #333;
 }
 
-.hidden-text-fragment,
-.hidden,
-a.note-tools--fold {
-  display: none;
-}
-
+a.note-tools--fold,
 svg.less {
   display: none;
 }
 
-.unfolded svg.less,
-.unfolded .hidden-text-fragment {
-  display: inline;
+.folded a.note-tools--fold,
+.folded.open a.note-tools--fold {
+  display: block;
 }
 
-.unfolded svg.more {
+svg.more {
+  display: block;
+}
+
+.folded.open svg.less {
+  display: block;
+}
+
+.folded.open svg.more {
   display: none;
 }
 
-.trimmed-text .note-tools--fold {
-  display: block;
+.folded {
+  height: 160px;
+  overflow: hidden;
+}
+
+.folded.open {
+  height: auto;
 }
 
 /* fec60d

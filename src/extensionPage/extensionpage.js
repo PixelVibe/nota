@@ -25,7 +25,7 @@ class NotesListFull extends Component {
       if (state.notes.hasOwnProperty(key)) {
         a.push(
           <h2>
-            <a onClick={openTab(key)}>{key}</a>
+            <a onClick={(e) => {openTab(key, e)}}>{key}</a>
           </h2>
         );
         a.push(
@@ -76,8 +76,9 @@ async function deleteNote(noteIndex, url, event) {
   }
 }
 
-function openTab(ref) {
-  // console.log(ref);
+function openTab(ref, event) {
+  event.preventDefault();
+  browser.tabs.create({url: ref})
 }
 
 render(<NotesListFull />, app);

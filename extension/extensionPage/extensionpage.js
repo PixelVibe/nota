@@ -870,7 +870,9 @@ class NotesListFull extends preact__WEBPACK_IMPORTED_MODULE_0__["Component"] {
     for (const key in state.notes) {
       if (state.notes.hasOwnProperty(key)) {
         a.push(Object(preact__WEBPACK_IMPORTED_MODULE_0__["h"])("h2", null, Object(preact__WEBPACK_IMPORTED_MODULE_0__["h"])("a", {
-          onClick: openTab(key)
+          onClick: e => {
+            openTab(key, e);
+          }
         }, key)));
         a.push(Object(preact__WEBPACK_IMPORTED_MODULE_0__["h"])("ul", null, state.notes[key].notes.map((note, index) => {
           return Object(preact__WEBPACK_IMPORTED_MODULE_0__["h"])("li", {
@@ -918,7 +920,11 @@ async function deleteNote(noteIndex, url, event) {
   }
 }
 
-function openTab(ref) {// console.log(ref);
+function openTab(ref, event) {
+  event.preventDefault();
+  browser.tabs.create({
+    url: ref
+  });
 }
 
 Object(preact__WEBPACK_IMPORTED_MODULE_0__["render"])(Object(preact__WEBPACK_IMPORTED_MODULE_0__["h"])(NotesListFull, null), app);
