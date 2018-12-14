@@ -5,6 +5,7 @@ class SidePanelNotes extends Component {
   constructor() {
     super();
     this.state.notes = [];
+    this.state.types = ['interesting', 'review', 'other'];
     this.state.filterByTag = '';
     this.state.filterByType = '';
     this.updateState = this.updateState.bind(this);
@@ -78,15 +79,7 @@ class SidePanelNotes extends Component {
           const trimText = note.text.length > 400;
           return (
             <li className={[trimText ? 'folded' : '', 'note-type--' + note.type].join(' ')}>
-              
-              {/* <a href="#" className={['note-type', 'note-type--' + note.type].join(' ')} onClick={() => {
-                this.setState({
-                  filterByType: note.type
-                })
-              }}></a> */}
-              
               {this.renderNoteTools(index)}
-              
               <div className="note-content">
                 <p>{note.text}</p>
                 <div className="note-tags">{note.tags.map((tag) => <span>#{tag}</span>)}</div>
@@ -104,11 +97,22 @@ class SidePanelNotes extends Component {
 
   renderNoteslistToolbar(state) {
     if (state.filterByType === '') {
-      return browser.i18n.getMessage("panelViewAllNotesInfo");
+      return (
+        <div>
+          <span>{browser.i18n.getMessage("panelViewAllNotesInfo")}</span>
+          {this.state.types.map((type) => {
+            return <a href="#" title={type} className={['note-type-selector', 'note-type--' + type].join(' ')} onClick={() => {
+              this.setState({
+                filterByType: type
+              })
+            }}></a>
+          })}
+        </div>
+      )
     } else {
-      <a href="#" onClick={() => this.setState({filterByType: ''})}>
-        {browser.i18n.getMessage("panelViewFilteredNotesOfType") + ' ' + state.filterByType}
-      </a>
+      return (<a href="#" onClick={() => this.setState({filterByType: ''})}>
+        <span>{browser.i18n.getMessage("panelViewFilteredNotesOfType") + ' ' + state.filterByType}</span>
+      </a>)
     }
   }
 
@@ -151,6 +155,8 @@ async function retrieveActiveTabURL() {
   return browser.tabs.query({ windowId, active: true }).then((tabs) => tabs[0].url);
 }
 
+let editingNote = -1;
+
 function editNote(noteIndex, event) {
   event.cancelBubble = true;
   editingNote = noteIndex;
@@ -173,3 +179,20 @@ function captureClickEvents(event, node) {
     }
   }
 }
+
+// Listen for incoming messages from other parts of the extension
+browser.runtime.onMessage.addListener((msg) => {
+  switch (msg.type) {
+    case 'popup-is-active': {
+      if (editingNote > -1) {
+        const noteIndex = editingNote;
+        editingNote = -1;
+        return Promise.resolve({
+          type: 'editing',
+          noteIndex
+        });
+      }
+    }
+
+  }
+})

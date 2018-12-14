@@ -848,6 +848,7 @@ class SidePanelNotes extends preact__WEBPACK_IMPORTED_MODULE_0__["Component"] {
   constructor() {
     super();
     this.state.notes = [];
+    this.state.types = ['interesting', 'review', 'other'];
     this.state.filterByTag = '';
     this.state.filterByType = '';
     this.updateState = this.updateState.bind(this);
@@ -955,14 +956,25 @@ class SidePanelNotes extends preact__WEBPACK_IMPORTED_MODULE_0__["Component"] {
 
   renderNoteslistToolbar(state) {
     if (state.filterByType === '') {
-      return browser.i18n.getMessage("panelViewAllNotesInfo");
+      return Object(preact__WEBPACK_IMPORTED_MODULE_0__["h"])("div", null, Object(preact__WEBPACK_IMPORTED_MODULE_0__["h"])("span", null, browser.i18n.getMessage("panelViewAllNotesInfo")), this.state.types.map(type => {
+        return Object(preact__WEBPACK_IMPORTED_MODULE_0__["h"])("a", {
+          href: "#",
+          title: type,
+          className: ['note-type-selector', 'note-type--' + type].join(' '),
+          onClick: () => {
+            this.setState({
+              filterByType: type
+            });
+          }
+        });
+      }));
     } else {
-      Object(preact__WEBPACK_IMPORTED_MODULE_0__["h"])("a", {
+      return Object(preact__WEBPACK_IMPORTED_MODULE_0__["h"])("a", {
         href: "#",
         onClick: () => this.setState({
           filterByType: ''
         })
-      }, browser.i18n.getMessage("panelViewFilteredNotesOfType") + ' ' + state.filterByType);
+      }, Object(preact__WEBPACK_IMPORTED_MODULE_0__["h"])("span", null, browser.i18n.getMessage("panelViewFilteredNotesOfType") + ' ' + state.filterByType));
     }
   }
 
@@ -1004,6 +1016,8 @@ async function retrieveActiveTabURL() {
   }).then(tabs => tabs[0].url);
 }
 
+let editingNote = -1;
+
 function editNote(noteIndex, event) {
   event.cancelBubble = true;
   editingNote = noteIndex;
@@ -1025,7 +1039,24 @@ function captureClickEvents(event, node) {
         // })
       }
   }
-}
+} // Listen for incoming messages from other parts of the extension
+
+
+browser.runtime.onMessage.addListener(msg => {
+  switch (msg.type) {
+    case 'popup-is-active':
+      {
+        if (editingNote > -1) {
+          const noteIndex = editingNote;
+          editingNote = -1;
+          return Promise.resolve({
+            type: 'editing',
+            noteIndex
+          });
+        }
+      }
+  }
+});
 
 /***/ })
 

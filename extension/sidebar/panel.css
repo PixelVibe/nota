@@ -26,14 +26,17 @@ ul li p {
   margin-top: 0;
 }
 
+.note-type-selector.note-type--other,
 .note-type--other .note-tools {
   background-color: #0e68b7;
 }
 
+.note-type-selector.note-type--review,
 .note-type--review .note-tools {
   background-color: #902f72;
 }
 
+.note-type-selector.note-type--interesting,
 .note-type--interesting .note-tools {
   background-color: #fb6c0e;
 }
@@ -146,6 +149,10 @@ svg.more {
   box-shadow: 0px 0px 8px #999;
 }
 
+.info span {
+  vertical-align: middle;
+}
+
 body {
   overflow: hidden;
 }
@@ -153,4 +160,14 @@ body {
 ul.notes {
   height: 100vh;
   overflow: auto;
+}
+
+.note-type-selector {
+  display: inline-block;
+  width: 20px;
+  height: 20px;
+  border: 1px transparent;
+  border-radius: 10px;
+  margin: 0 4px;
+  vertical-align: middle;
 }
