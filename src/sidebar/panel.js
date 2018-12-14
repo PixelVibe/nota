@@ -43,7 +43,7 @@ class SidePanelNotes extends Component {
     return (
       <div className="note-tools">
         <a href="#" className="note-tools--edit" onClick={() => {
-          editNote(index, e)
+          editNote(index);
         }}>
           <svg className="edit" width='24' height='24' viewBox='0 0 24 24'>
             <use xlinkHref="#edit" />
@@ -71,15 +71,23 @@ class SidePanelNotes extends Component {
 
   // .filter((note) => !(state.filterByTag !== '' && !~note.tags.indexOf(state.filterByTag)))
   renderNoteItems(state) {
+    let filteredNotesIdx = [];
     const notes =
       state
         .notes
-        .filter((note) => state.filterByType === '' || state.filterByType == note.type)
+        .filter((note, index) => {
+          if (state.filterByType === '' || state.filterByType == note.type) {
+            filteredNotesIdx.push(index);
+            return true;
+          } else {
+            return false;
+          }
+        })
         .map((note, index) => {
           const trimText = note.text.length > 400;
           return (
             <li className={[trimText ? 'folded' : '', 'note-type--' + note.type].join(' ')}>
-              {this.renderNoteTools(index)}
+              {this.renderNoteTools(filteredNotesIdx[index])}
               <div className="note-content">
                 <p>{note.text}</p>
                 <div className="note-tags">{note.tags.map((tag) => <span>#{tag}</span>)}</div>
@@ -158,7 +166,6 @@ async function retrieveActiveTabURL() {
 let editingNote = -1;
 
 function editNote(noteIndex, event) {
-  event.cancelBubble = true;
   editingNote = noteIndex;
   browser.browserAction.openPopup();
 }

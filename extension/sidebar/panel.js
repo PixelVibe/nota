@@ -890,7 +890,7 @@ class SidePanelNotes extends preact__WEBPACK_IMPORTED_MODULE_0__["Component"] {
       href: "#",
       className: "note-tools--edit",
       onClick: () => {
-        editNote(index, e);
+        editNote(index);
       }
     }, Object(preact__WEBPACK_IMPORTED_MODULE_0__["h"])("svg", {
       className: "edit",
@@ -936,11 +936,19 @@ class SidePanelNotes extends preact__WEBPACK_IMPORTED_MODULE_0__["Component"] {
 
 
   renderNoteItems(state) {
-    const notes = state.notes.filter(note => state.filterByType === '' || state.filterByType == note.type).map((note, index) => {
+    let filteredNotesIdx = [];
+    const notes = state.notes.filter((note, index) => {
+      if (state.filterByType === '' || state.filterByType == note.type) {
+        filteredNotesIdx.push(index);
+        return true;
+      } else {
+        return false;
+      }
+    }).map((note, index) => {
       const trimText = note.text.length > 400;
       return Object(preact__WEBPACK_IMPORTED_MODULE_0__["h"])("li", {
         className: [trimText ? 'folded' : '', 'note-type--' + note.type].join(' ')
-      }, this.renderNoteTools(index), Object(preact__WEBPACK_IMPORTED_MODULE_0__["h"])("div", {
+      }, this.renderNoteTools(filteredNotesIdx[index]), Object(preact__WEBPACK_IMPORTED_MODULE_0__["h"])("div", {
         className: "note-content"
       }, Object(preact__WEBPACK_IMPORTED_MODULE_0__["h"])("p", null, note.text), Object(preact__WEBPACK_IMPORTED_MODULE_0__["h"])("div", {
         className: "note-tags"
@@ -1019,7 +1027,6 @@ async function retrieveActiveTabURL() {
 let editingNote = -1;
 
 function editNote(noteIndex, event) {
-  event.cancelBubble = true;
   editingNote = noteIndex;
   browser.browserAction.openPopup();
 }
