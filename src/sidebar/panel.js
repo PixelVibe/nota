@@ -69,7 +69,6 @@ class SidePanelNotes extends Component {
     )
   }
 
-  // .filter((note) => !(state.filterByTag !== '' && !~note.tags.indexOf(state.filterByTag)))
   renderNoteItems(state) {
     let filteredNotesIdx = [];
     const notes =
